@@ -1,0 +1,84 @@
+{
+    "android": {
+        "GoogleAnalytics": {
+            "trackingCode": "UA-17485141-7"
+        }, 
+        "AdMob": {
+            "ads": {
+                "bottom_banner": {
+                    "width": 0, 
+                    "type": "banner", 
+                    "id": "ca-app-pub-5405617765701389/5271720952", 
+                    "alignment": "bottom", 
+                    "height": 0
+                }, 
+                "on_back_fs": {
+                    "type": "interstitial", 
+                    "id": "ca-app-pub-5405617765701389/7214222152"
+                },
+                "gameplay_fs": {
+                    "type": "interstitial", 
+                    "id": "ca-app-pub-5405617765701389/6748454150"
+                }, 
+                "dbbox": {
+                    "width": 300, 
+                    "type": "banner", 
+                    "id": "ca-app-pub-5405617765701389/9352203699", 
+                    "alignment": "center", 
+                    "height": 250
+                }
+            }, 
+            "cache": {
+                "bottom_banner": true, 
+                "gameplay_fs": true, 
+                "dbbox": true, 
+                "on_back_fs": true
+            }, 
+            "testdevice": "kGADSimulatorID", 
+            "appid": "ca-app-pub-5405617765701389~2318254555", 
+            "test": true, 
+            "safearea": true
+        }, 
+        "Facebook": {
+            "debug": true
+        }
+    }, 
+    "ios": {
+        "AdMob": {
+            "ads": {
+                "bottom_banner": {
+                    "width": 0, 
+                    "type": "banner", 
+                    "id": "ca-app-pub-5405617765701389/6304532249", 
+                    "alignment": "bottom", 
+                    "height": 0
+                }, 
+                "on_back_fs": {
+                    "type": "interstitial", 
+                    "id": "ca-app-pub-5405617765701389/9894032434"
+                }, 
+                "gameplay_fs": {
+                    "type": "interstitial", 
+                    "id": "ca-app-pub-5405617765701389/9707284554"
+                }, 
+                "dbbox": {
+                    "width": 300, 
+                    "type": "banner", 
+                    "id": "ca-app-pub-5405617765701389/6398737290", 
+                    "alignment": "center", 
+                    "height": 250
+                }
+            }, 
+            "cache": {
+                "bottom_banner": true, 
+                "gameplay_fs": true, 
+                "dbbox": true, 
+                "on_back_fs": true
+            }, 
+            "testdevice": "kGADSimulatorID", 
+            "appid": "ca-app-pub-5405617765701389~5277084951", 
+            "test": false, 
+            "safearea": true
+        }
+    }
+}
