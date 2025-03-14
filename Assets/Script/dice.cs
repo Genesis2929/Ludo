@@ -139,66 +139,7 @@ public class LudoDice2D : MonoBehaviour
         else if (noofAI == 1)
         {
             StartCoroutine(AIfunc(noofAI));
-            //if (allowInteraction)
-            //{
-            //    AIplayernum = AIplayernum1;
-            //    AInumber = AIplayernum;
 
-            //    AInumber = AIplayernum;
-            //    //if (PieceManager.AIroll)
-
-            //    if (firstime == 0)
-            //    {
-            //        AIjustnumber = AIplayernum1;
-            //        firstime++;
-            //    }
-
-            //    if (currentPlayerIndex != AIplayernum1)
-            //    {
-            //        isAI = false;
-            //    }
-            //    Debug.Log("CurrentPlayerAndAIjustnumber:"+currentPlayerIndex+":"+AIjustnumber+":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"); 
-            //    if (currentPlayerIndex == AIplayernum1)
-            //    {
-            //        if (isAI == false || AIagain == true)
-            //        {
-
-            //            bool changed = gameObject.GetComponent<Collider2D>().enabled;
-            //            Debug.Log("ColliderBool:" + changed);
-
-            //            Debug.Log("allowinteraction:" + allowInteraction + ":Changed:" + changed);
-            //            if (changed)
-            //            {
-            //                AIagain = false;
-
-            //                isAIturn = true;
-            //                //isAI = true;
-            //                dicenumberchange();
-            //                dicecount++;
-            //                //checkingturnandskip(false);
-            //                //PieceManager.AIenable = false;
-            //                AIforPieceManagerNumber = AIjustnumber;
-            //                StartCoroutine(RollDice());
-
-            //                while (coroutinecompletes == false)
-            //                {
-            //                    Debug.Log("wait for coroutine to  complete");
-            //                }
-            //                Debug.Log("AI:" + currentPlayerIndex);
-            //                coroutinecompletes = false;
-            //                //isAI = false;
-
-            //            }
-            //            isAI = true;
-            //        }
-
-            //    }
-
-            //}
-            //else
-            //{
-            //    touchroll();
-            //}
         }
         else if (noofAI == 2)
         {
@@ -214,7 +155,7 @@ public class LudoDice2D : MonoBehaviour
     }
     void AIsubfunc(int numberofai, bool forward)
     {
-        Debug.Log("AInumberchange");
+        //Debug.Log("AInumberchange");
 
         if (forward)
         {
@@ -311,7 +252,7 @@ public class LudoDice2D : MonoBehaviour
         if (allowInteraction == true && thiscodecomplete == true && piecemanagercodecomplete == true)
         {
 
-            Debug.Log("startagaininteraction");
+            //Debug.Log("startagaininteraction");
             //allowInteraction = false;
 
             //if(allowinteractionnumber == 0)
@@ -336,8 +277,8 @@ public class LudoDice2D : MonoBehaviour
             //    isAI = false;
             //}
 
-            Debug.Log("In AIfunc at start:" + "Currentplayerindex:" + currentPlayerIndex + ":AIjustnumber:" + AIjustnumber);
-            Debug.Log("CurrentPlayerAndAIjustnumber:" + currentPlayerIndex + ":" + AIjustnumber + ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+            //Debug.Log("In AIfunc at start:" + "Currentplayerindex:" + currentPlayerIndex + ":AIjustnumber:" + AIjustnumber);
+            //Debug.Log("CurrentPlayerAndAIjustnumber:" + currentPlayerIndex + ":" + AIjustnumber + ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
 
             if (currentPlayerIndex == AIjustnumber)
             {
@@ -349,9 +290,9 @@ public class LudoDice2D : MonoBehaviour
                 {
 
                     bool changed = gameObject.GetComponent<Collider2D>().enabled;
-                    Debug.Log("ColliderBool:" + changed);
+                    //Debug.Log("ColliderBool:" + changed);
 
-                    Debug.Log("allowinteraction:" + allowInteraction + ":Changed:" + changed);
+                    //Debug.Log("allowinteraction:" + allowInteraction + ":Changed:" + changed);
                     if (changed)
                     {
                         AIagain = false;
@@ -389,7 +330,7 @@ public class LudoDice2D : MonoBehaviour
                         //    turnchangecheck = false;
                         //    isAIturn = false;
                         //}
-                        Debug.Log("AI:" + currentPlayerIndex);
+                        //Debug.Log("AI:" + currentPlayerIndex);
                         thiscodecomplete = true;
                         //isAI = false;
                         //AIjustnumber = currentPlayerIndex;
@@ -442,7 +383,7 @@ public class LudoDice2D : MonoBehaviour
             //}
             else
             {
-                Debug.Log("Not equal");
+                //Debug.Log("Not equal");
                 touchroll();
                 //touchbool = true;
                 thiscodecomplete = true;
@@ -456,7 +397,7 @@ public class LudoDice2D : MonoBehaviour
 
     public void touchroll()
     {
-        Debug.Log("Inside touchroll");
+        //Debug.Log("Inside touchroll");
         if (Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
@@ -565,7 +506,7 @@ public class LudoDice2D : MonoBehaviour
     }
     void checkingturnandskip(bool aicalling)
     {
-        Debug.Log("InsideCheckturingandskip");
+        //Debug.Log("InsideCheckturingandskip");
         if (optionscript.threeoneskip || optionscript.threesixskip || optionscript.threeonecut || optionscript.threesixcut)
         {
             if (threeoneorsix)
@@ -581,7 +522,7 @@ public class LudoDice2D : MonoBehaviour
 
                 //}
 
-                Debug.Log("CurrentPlayerIndex:" + currentPlayerIndex);
+                //Debug.Log("CurrentPlayerIndex:" + currentPlayerIndex);
                 threeoneorsix = false;
             }
             else
@@ -593,7 +534,7 @@ public class LudoDice2D : MonoBehaviour
                         //currentPlayerIndex = (currentPlayerIndex - 1 + 4) % 4;
                         turnchange(false);
 
-                        Debug.Log("CurrentPlayerIndexafterturningchange:"+currentPlayerIndex+":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+                        //Debug.Log("CurrentPlayerIndexafterturningchange:"+currentPlayerIndex+":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
                         turnchangecheck = true;
                         //if (aicalling)
                         //AIsubfunc(noofAI, false);
@@ -614,7 +555,7 @@ public class LudoDice2D : MonoBehaviour
                 {
                     //currentPlayerIndex = (currentPlayerIndex - 1 + 4) % 4;
                     turnchange(false);
-                    Debug.Log("CurrentPlayerIndexafterturningchange:" + currentPlayerIndex + ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+                    //Debug.Log("CurrentPlayerIndexafterturningchange:" + currentPlayerIndex + ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
 
                     turnchangecheck = true;
                     //if (aicalling)
@@ -692,7 +633,7 @@ public class LudoDice2D : MonoBehaviour
 
         // Dice rolling animation
         float animInterval = rollDuration / rollAnimFrames;
-        Debug.Log("Currentplayer" + CurrentPlayer + "CurrentPlayerIndex:" + currentPlayerIndex);
+        //Debug.Log("Currentplayer" + CurrentPlayer + "CurrentPlayerIndex:" + currentPlayerIndex);
         for (int i = 0; i < rollAnimFrames; i++)
         {
             int randomrotrange = Random.Range(0, 360);
@@ -827,7 +768,7 @@ public class LudoDice2D : MonoBehaviour
 
     public void AIturnenablefunc()
     {
-        Debug.Log("InsideAIturnenable");
+        //Debug.Log("InsideAIturnenable");
         if (currentPlayerIndex == AIjustnumber)
         {
             AIagain = true;
@@ -835,7 +776,7 @@ public class LudoDice2D : MonoBehaviour
     }
     void checkformovingturn(bool checking2)
     {
-        Debug.Log("Checkformovingturn");
+        //Debug.Log("Checkformovingturn");
         if ((oneorsix == 1 && optionscript.sixgiveanotherturn == true) || (oneorsix == 6 && optionscript.onealsogiveturn == true))
         {
             if (finalValue != 1 && finalValue != 6)
@@ -888,7 +829,7 @@ public class LudoDice2D : MonoBehaviour
 
     void MoveToNextPlayer(bool checking)
     {
-        Debug.Log("InsideMovetoNextplayer");
+        //Debug.Log("InsideMovetoNextplayer");
         if (checking == true)
             turnchange(true);
         //currentPlayerIndex = (currentPlayerIndex + 1) % 4;
@@ -917,7 +858,7 @@ public class LudoDice2D : MonoBehaviour
     // Call this when player finishes moving their piece
     public void EndTurn()
     {
-        Debug.Log("InsideEndturn");
+        //Debug.Log("InsideEndturn");
         checkformovingturn(false);
 
     }
@@ -926,7 +867,7 @@ public class LudoDice2D : MonoBehaviour
     public void turnchange(bool forward)
     {
         //turnchangecheck = true;
-        Debug.Log("hi");
+        //Debug.Log("hi");
         if (forward)
         {
             if (playernum == 4)
@@ -952,7 +893,7 @@ public class LudoDice2D : MonoBehaviour
                 else if (currentPlayerIndex == player2)
                 {
                     currentPlayerIndex = player3;
-                    Debug.Log("Hi2" + currentPlayerIndex);
+                    //Debug.Log("Hi2" + currentPlayerIndex);
                 }
                 else if (currentPlayerIndex == player3)
                 {

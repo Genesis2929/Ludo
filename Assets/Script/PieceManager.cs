@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using UnityEngine.TextCore.Text;
 using UnityEngine.UIElements;
+using TMPro;
 
 public class PieceManager : MonoBehaviour
 {
@@ -38,9 +39,13 @@ public class PieceManager : MonoBehaviour
 
     public  bool isAI = false;
     public bool AIroll = false;
-    public Piece lastmovepiece;
+    public static Piece lastmovepiece;
 
     public List<Piece> currentPlayerPieces = new List<Piece>();
+
+    public Dictionary<int, List<GameObject>> samePosDictionary = new Dictionary<int, List<GameObject>>();
+    public List<GameObject> playerList = new List<GameObject>();
+    public int currpos;
     private void Start()
     {
         if(greenpiece != null)
@@ -84,6 +89,11 @@ public class PieceManager : MonoBehaviour
         }
     }
 
+
+    //void dictioinaryshow()
+    //{
+    //    foreach(GameObject gm in Piece.samePosDictionary[Piece.Currentposit])
+    //}
     void OnEnable()
     {
         LudoDice2D.OnDiceRollCompleted += HandleDiceResult;
@@ -373,6 +383,7 @@ public class PieceManager : MonoBehaviour
     IEnumerator MovePiece(Piece piece)
     {
         piece.wasjustmoving = true;
+        lastmovepiece = piece;
         // Handle base exit
         if(piece.ispressedbyotherpiece)
         {
@@ -389,6 +400,11 @@ public class PieceManager : MonoBehaviour
                 piece.lastposition = piece.CurrentPosition;
                 piece.ExitBase();
                 yield return boardPath.MovePieceToStart(piece, moveDuration);
+                if (piece.CurrentPosition == 0)
+                {
+                    piece.ismoving = false;
+                    Debug.Log("ismovingfalse");
+                }
             }
             else
             {
@@ -410,7 +426,7 @@ public class PieceManager : MonoBehaviour
 
 
         }
-        lastmovepiece = piece;
+
         StartCoroutine(delayfor5(0.5f));
 
     }

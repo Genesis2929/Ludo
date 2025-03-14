@@ -132,13 +132,15 @@ public class Piece : MonoBehaviour
     {
         if (samePosDictionary.ContainsKey(olddictionaryposition))
         {
+            Debug.Log("Listmaintain1");
             if (olddictionaryposition != CurrentPosition)
             {
+            Debug.Log("Listmaintain2");
                 samePosDictionary[olddictionaryposition].Remove(gameObject);
             
                 foreach(GameObject obj in samePosDictionary[olddictionaryposition])
                 {
-                    movesortorder(obj, obj, false);
+                    movesortorder(gameObject, gameObject, false);
 
                     Piece objpiece  = obj.GetComponent<Piece>();
                     if(objpiece.toppositionnumber >= 1)
@@ -158,10 +160,12 @@ public class Piece : MonoBehaviour
 
     private void Start()
     {
+
         
         checkplayerenable();
         IsInBase = true;
         lastposition = CurrentPosition;
+        //olddictionaryposition = CurrentPosition;
         initialpiecesetup();
 
     }
@@ -321,9 +325,23 @@ public class Piece : MonoBehaviour
         }
 
 
+        //if(CurrentPosition != olddictionaryposition)
+        //{
+        //    listmaintain();
+        //}
+
         if (!wasjustmoving)
         {
             lastposition = CurrentPosition;
+        }
+
+        if(PieceManager.lastmovepiece!= null)
+        {
+            if(PieceManager.lastmovepiece.gameObject != this.gameObject )
+            {
+                lastposition = CurrentPosition;
+            }
+
         }
     }
     public void ToggleHighlight(bool state)
@@ -431,13 +449,44 @@ public class Piece : MonoBehaviour
     }
 
 
-    private void OnTriggerExit2D(Collider2D other)
-    {
-        if(other.gameObject.CompareTag("Piece"))
-        {
-            if(other.gameObject.GetComponent<Piece>().colornum != colornum)
-                 listmaintain();
+    //private void OnTriggerExit2D(Collider2D other)
+    //{
+    //    if(other.gameObject.CompareTag("Piece"))
+    //    {
+    //        if(other.gameObject.GetComponent<Piece>().colornum != colornum)
+    //             listmaintain();
 
+    //    }
+    //}
+
+
+    bool pendingListUpdate = false;
+    void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Piece"))
+        {
+            if (collision.gameObject.GetComponent<Piece>().colornum != colornum)
+            {
+                if(wasjustmoving)
+                {
+                    if(ismoving == false)
+                    {
+                         pendingListUpdate = true;
+
+                    }
+                }
+
+            }
+        }
+    }
+
+    void FixedUpdate()
+    {
+        //listmaintain();
+        if (pendingListUpdate)
+        {
+            listmaintain();
+            pendingListUpdate = false;
         }
     }
     void OnTriggerStay2D(Collider2D collision)
@@ -484,6 +533,7 @@ public class Piece : MonoBehaviour
                                
                                         samepositionmaintainlist(ps.toppositionnumber, ps.gameObject);
                                         Debug.Log("PieceColornum:" + colornum+":++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+
                                     }
 
                                     else
