@@ -103,7 +103,7 @@ public class PieceManager : MonoBehaviour
     {
         LudoDice2D.OnDiceRollCompleted -= HandleDiceResult;
     }
-
+    public bool threeconsecutivecut = false;
     void HandleDiceResult(int playerIndex, int diceValue)
     {
         if(LudoDice2D.threeoneorsix)
@@ -112,14 +112,24 @@ public class PieceManager : MonoBehaviour
             {
                 if(lastmovepiece != null)
                 {
-                    lastmovepiece.cutpiece(lastmovepiece.colornum, lastmovepiece.piecenumber, lastmovepiece.gameObject);
+                    threeconsecutivecut = true;
+                    //StartCoroutine(MovePiece(lastmovepiece));
+                    if (threeconsecutivecut)
+                    {
+                        lastmovepiece.lastposition = lastmovepiece.CurrentPosition;
+                        lastmovepiece.beforecurrrentposition = -1;
+                        lastmovepiece.wasjustmoving = true;
+                        lastmovepiece.cutpiece(lastmovepiece.colornum, lastmovepiece.piecenumber, lastmovepiece.gameObject);
 
-                    lastmovepiece.IsInBase = true;
-                    lastmovepiece.CurrentPosition = -1;
+                        lastmovepiece.IsInBase = true;
+                        lastmovepiece.CurrentPosition = -1;
+                        threeconsecutivecut = false;
+                    }
+
                 }
 
                 StartCoroutine(delayfor5(1.5f));
-                diceSystem.EndTurn();
+                //diceSystem.EndTurn();
             }
            else
             {
@@ -250,6 +260,8 @@ public class PieceManager : MonoBehaviour
             SetLayerForPieces(player4Pieces, "Default");
         }
     }
+
+    public bool selectablebool = false;
     private void Update()
     {
 
@@ -258,6 +270,20 @@ public class PieceManager : MonoBehaviour
             
             Piece ps = Piece.selectedpiece.GetComponent<Piece>();
 
+            foreach(Piece piecemove in movablePieces)
+            {
+                if(piecemove.gameObject == ps.gameObject)
+                {
+                    selectablebool = true;
+                }
+            }
+            if(selectablebool == false)
+            {
+                Piece.alreadyselected = false;
+                Piece.selectedpiece = null;
+                //selectedpiecemove = false;
+                return;
+            }
             Debug.Log("ColorNum"+ps.colornum+":colorchoose"+colorchoose);
             if(ps.colornum == colorchoose)
             {
@@ -301,6 +327,8 @@ public class PieceManager : MonoBehaviour
             }
 
             AIenable = true;
+
+            selectablebool = false;
         }
     }
     List<Piece> GetPlayerPieces(int playerIndex)
@@ -382,8 +410,17 @@ public class PieceManager : MonoBehaviour
 
     IEnumerator MovePiece(Piece piece)
     {
+
+       
+        if(lastmovepiece != null)
+        {
+            lastmovepiece.lastposition = lastmovepiece.CurrentPosition;
+            lastmovepiece.wasjustmoving = false;
+
+        }
         piece.wasjustmoving = true;
         lastmovepiece = piece;
+
         // Handle base exit
         if(piece.ispressedbyotherpiece)
         {
@@ -399,6 +436,7 @@ public class PieceManager : MonoBehaviour
                 piece.ismoving = true;
                 piece.lastposition = piece.CurrentPosition;
                 piece.ExitBase();
+                piece.beforecurrrentposition = 0;
                 yield return boardPath.MovePieceToStart(piece, moveDuration);
                 if (piece.CurrentPosition == 0)
                 {
@@ -412,7 +450,7 @@ public class PieceManager : MonoBehaviour
                 piece.lastposition = piece.CurrentPosition;
 
                 int targetPosition = piece.CurrentPosition + currentDiceValue;
- 
+                piece.beforecurrrentposition = targetPosition;
                 //Debug.Log(piece.ismoving);
                 // Regular movement
                 yield return boardPath.MovePieceAlongPath(piece, piece.CurrentPosition, targetPosition, moveDuration);
@@ -428,6 +466,7 @@ public class PieceManager : MonoBehaviour
         }
 
         StartCoroutine(delayfor5(0.5f));
+        Piece.endtriggeronetime = false;
 
     }
 
