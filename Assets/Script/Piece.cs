@@ -191,7 +191,15 @@ public class Piece : MonoBehaviour
         {
             currentPiece.ispressedbyotherpiece = false;
         }
+        else
+        {
+            currentPiece.ispressedbyotherpiece = true;
+        }
         if(targetPiece.toppositionnumber == 0)
+        {
+            targetPiece.ispressedbyotherpiece = false;
+        }
+        else
         {
             targetPiece.ispressedbyotherpiece = false;
         }
