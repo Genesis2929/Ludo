@@ -278,7 +278,7 @@ public class Piece : MonoBehaviour
     }
     void homereached()
     {
-        this.gameObject.GetComponent<Collider2D>().enabled = false;
+        //this.gameObject.GetComponent<Collider2D>().enabled = false;
         IsInHome = true;
     }
 
@@ -498,24 +498,24 @@ public class Piece : MonoBehaviour
 
         // Here we assume that "certainpiece" (this gameObject) has exactly two children.
         SpriteRenderer childRenderer1 = gm.transform.GetChild(0).GetComponent<SpriteRenderer>();
-        SpriteRenderer childRenderer2 = gm.transform.GetChild(1).GetComponent<SpriteRenderer>();
+        //SpriteRenderer childRenderer2 = gm.transform.GetChild(1).GetComponent<SpriteRenderer>();
 
         if(swap)
         {
             SpriteRenderer childRenderer11 = gm1.transform.GetChild(0).GetComponent<SpriteRenderer>();
-            SpriteRenderer childRenderer22 = gm1.transform.GetChild(1).GetComponent<SpriteRenderer>();
+            //SpriteRenderer childRenderer22 = gm1.transform.GetChild(1).GetComponent<SpriteRenderer>();
 
             int tempsortingorder;
             // Safety check in case one of the children is missing a SpriteRenderer.
-            if (childRenderer1 != null && childRenderer2 != null && childRenderer11 != null && childRenderer22 != null)
+            if (childRenderer1 != null && childRenderer11 != null)
             {
                 tempsortingorder = childRenderer1.sortingOrder;
                 childRenderer1.sortingOrder = childRenderer11.sortingOrder;
                 childRenderer11.sortingOrder = tempsortingorder;
 
-                tempsortingorder = childRenderer2.sortingOrder;
-                childRenderer2.sortingOrder = childRenderer22.sortingOrder;
-                childRenderer22.sortingOrder = tempsortingorder;
+                //tempsortingorder = childRenderer2.sortingOrder;
+                //childRenderer2.sortingOrder = childRenderer22.sortingOrder;
+                //childRenderer22.sortingOrder = tempsortingorder;
             }
 
         }
@@ -524,14 +524,14 @@ public class Piece : MonoBehaviour
             if(add == false)
             {
                 childRenderer1.sortingOrder = childRenderer1.sortingOrder - 1;
-                childRenderer2.sortingOrder = childRenderer2.sortingOrder - 1;
+                //childRenderer2.sortingOrder = childRenderer2.sortingOrder - 1;
 
             }
             else
             {
 
                 childRenderer1.sortingOrder = childRenderer1.sortingOrder + 1;
-                childRenderer2.sortingOrder = childRenderer2.sortingOrder + 1;
+                //childRenderer2.sortingOrder = childRenderer2.sortingOrder + 1;
             }
         }
 
@@ -650,16 +650,18 @@ public class Piece : MonoBehaviour
                                 // Get all child SpriteRenderer components from the Piece object.
                                 SpriteRenderer[] pieceChildRenderers = collision.gameObject.GetComponentsInChildren<SpriteRenderer>();
 
+                                Debug.Log("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+
                                 // Ensure that we have at least 2 child SpriteRenderers in the Piece object.
-                                if (pieceChildRenderers.Length >= 2)
+                                if (pieceChildRenderers.Length >= 1)
                                 {
                                     // Get the child SpriteRenderer components from "certainpiece"
                                     // Here we assume that "certainpiece" (this gameObject) has exactly two children.
                                     SpriteRenderer childRenderer1 = transform.GetChild(0).GetComponent<SpriteRenderer>();
-                                    SpriteRenderer childRenderer2 = transform.GetChild(1).GetComponent<SpriteRenderer>();
+                                    //SpriteRenderer childRenderer2 = transform.GetChild(1).GetComponent<SpriteRenderer>();
 
                                     // Safety check in case one of the children is missing a SpriteRenderer.
-                                    if (childRenderer1 != null && childRenderer2 != null)
+                                    if (childRenderer1 != null)
                                     {
                                         // Assign the sorting order from the Piece's children to the corresponding children in "certainpiece".
                                         //childRenderer1.sortingOrder = pieceChildRenderers[0].sortingOrder + 1;
@@ -727,7 +729,7 @@ public class Piece : MonoBehaviour
 
         }
     }
-
+    
     public void cutpiece(int colornumber, int piecenum, GameObject gobj)
     {
         if (colornumber == 3)

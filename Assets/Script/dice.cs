@@ -53,7 +53,7 @@ public class LudoDice2D : MonoBehaviour
     public static int AIjustnumber = 0;
     public static int AInumber;
     [SerializeField] private float throwForceMultiplier = 50f;
-
+    public int probabilityplayer =0;
 
     public float dragamount = 1f;
     int prevdicenumber = 0;
@@ -92,8 +92,9 @@ public class LudoDice2D : MonoBehaviour
 
     public static int AIforPieceManagerNumber = 0;
     public bool coroutinecompletes = false;
-    void Start()
+    void Awake()
     {
+        noofAI = 0;
         coroutinecompletes = false;
         touchbool = false;
         oneofai = false;
@@ -111,7 +112,8 @@ public class LudoDice2D : MonoBehaviour
         player2 = playernumber2;
         player3 = playernumber3;
         player4 = playernumber4;
-        AInumber = AIplayernum;
+
+
 
         //initialRotation = transform.rotation;
         if (diceRenderer == null)
@@ -125,16 +127,164 @@ public class LudoDice2D : MonoBehaviour
         {
             oneorsix = 1;
         }
+        playerAIorhumandecide();
 
+        currentPlayerIndex = playernumber1;
+        changedicecoloronturn(1);
+        AInumber = AIplayernum;
         //UpdateTurnDisplay();
     }
 
+    void playerAIorhumandecide()
+    {
+        if(PlayerPrefs.HasKey("Player1") && PlayerPrefs.HasKey("Player2") && PlayerPrefs.HasKey("Player3") && PlayerPrefs.HasKey("Player4") && PlayerPrefs.HasKey("PlayerNumber"))
+        {
+            int p1, p2, p3, p4, pnum, Ai1, Ai2, Ai3, Ai4, Ainum;
+             p1 = PlayerPrefs.GetInt("Player1");
+             p2 = PlayerPrefs.GetInt("Player2");
+             p3 = PlayerPrefs.GetInt("Player3");
+             p4 = PlayerPrefs.GetInt("Player4");
+             pnum = PlayerPrefs.GetInt("PlayerNumber");
+
+            Ai1 = PlayerPrefs.GetInt("AI1");
+            Ai2 = PlayerPrefs.GetInt("AI2");
+            Ai3 = PlayerPrefs.GetInt("AI3");
+            Ai4 = PlayerPrefs.GetInt("AI4");
+            Ainum = PlayerPrefs.GetInt("AINumber");
+
+
+
+            if(p1 == 1)
+            {
+                player1 = 0;
+                if(p2 == 1)
+                {
+                    player2 = 1;
+
+                    if(p3 == 1)
+                    {
+                        player3 = 2;
+                        if(p4 == 1)
+                        {
+                            player4 = 3;
+                        }
+                    }
+                }
+                else if(p3 == 1)
+                {
+                    player2 = 2;
+                    if(p4 == 1)
+                    {
+                        player3 = 3;
+                    }
+                }
+                else if(p4 == 1)
+                {
+                    player2 = 3;
+                }
+            }
+            else if(p2 == 1)
+            {
+                player1 = 1;
+                if(p3 == 1)
+                {
+                    player2 = 2;
+                    if(p4 == 1)
+                    {
+                        player3 = 3;
+                    }
+                }
+                else if(p4 == 1)
+                {
+                    player2 = 3;
+                }
+            }
+            else if(p3 == 1)
+            {
+                player1 = 2;
+                if(p4 == 1)
+                {
+                    player2 = 3;
+                }
+            }
+            AIplayernum = Ainum;
+            noofAI = Ainum;
+            //if(Ainum == 1)
+            {
+                if (Ai1 == 1)
+                {
+                    AIplayernum1 = 0;
+
+                    if (Ai2 == 1)
+                    {
+                        AIplayernum2 = 1;
+                        if (Ai3 == 1)
+                        {
+                            AIplayernum3 = 2;
+                        }
+                    }
+                    else if (Ai3 == 1)
+                    {
+                        AIplayernum2 = 2;
+                    }
+                }
+                else if (Ai2 == 1)
+                {
+                    AIplayernum1 = 1;
+                    if (Ai3 == 1)
+                    {
+                        AIplayernum2 = 2;
+
+                        if (Ai4 == 1)
+                        {
+                            AIplayernum3 = 3;
+                        }
+                    }
+                    else if (Ai4 == 1)
+                    {
+                        AIplayernum2 = 3;
+                    }
+                }
+                else if(Ai3 == 1)
+                {
+                    AIplayernum1 = 2;
+                    if(Ai4 == 1)
+                    {
+                        AIplayernum2 = 3;
+                    }
+                }
+                else if(Ai4 == 1)
+                {
+                    AIplayernum1 = 3;
+                }
+            }
+            //if(pnum == 2)
+            
+                //player1 = p1;
+                //player2 = p2;
+                //player3 = p3;
+                //player4 = p4;
+                playernum = pnum;
+
+                playernumber1 = player1;
+                playernumber2 = player2;
+                playernumber3 = player3;
+                playernumber4 = player4;
+                playernumber = pnum;
+
+                Debug.Log(player1+player2 +player3 +player4 +playernum);    
+                
+            
+
+            
+        }
+    }
 
     public void AIrollfunc()
     {
         if (noofAI == 0)
         {
-            touchroll();
+            StartCoroutine(touchroll());
         }
         else if (noofAI == 1)
         {
@@ -384,7 +534,7 @@ public class LudoDice2D : MonoBehaviour
             else
             {
                 //Debug.Log("Not equal");
-                touchroll();
+                yield return StartCoroutine(touchroll());
                 //touchbool = true;
                 thiscodecomplete = true;
                 AIsubfunc(numberofai, true);
@@ -395,7 +545,7 @@ public class LudoDice2D : MonoBehaviour
         }
     }
 
-    public void touchroll()
+    IEnumerator touchroll()
     {
         //Debug.Log("Inside touchroll");
         if (Input.touchCount > 0)
@@ -456,7 +606,7 @@ public class LudoDice2D : MonoBehaviour
                         dicecount++;
                         checkingturnandskip(false);
 
-                        StartCoroutine(RollDice());
+                        yield return StartCoroutine(RollDice());
                     }
                     isDragging = false;
                 }
@@ -467,6 +617,7 @@ public class LudoDice2D : MonoBehaviour
 
     private float timer = 0f;
     public float interval = 0.5f; // Seconds
+
 
     public void Update()
     {
@@ -483,7 +634,13 @@ public class LudoDice2D : MonoBehaviour
 
     }
 
+    private int[] weightedDice = new int[] { 1, 2, 3, 1, 4, 5, 6, 6 };
 
+    public int probDice()
+    {
+        int randomIndex = Random.Range(0, weightedDice.Length);
+        return weightedDice[randomIndex];
+    }
     public void changedicecoloronturn(int dicevalue)
     {
         if (CurrentPlayer == 1)
@@ -665,7 +822,11 @@ public class LudoDice2D : MonoBehaviour
         // Get final result
         if (oneappeardice == false)
         {
-            finalValue = Random.Range(1, 7);
+            if (currentPlayerIndex != probabilityplayer)
+                finalValue = Random.Range(1, 7);
+
+            else
+                finalValue = probDice();
 
         }
         else
@@ -673,6 +834,7 @@ public class LudoDice2D : MonoBehaviour
             finalValue = oneorsix;
         }
         //finalValue = 1;
+        //finalValue = 1; ///////////////////////////////////////////////////////////
 
         if (oneorsix == 1)
         {
@@ -715,7 +877,6 @@ public class LudoDice2D : MonoBehaviour
             }
         }
         //finalValue = 6;
-
 
         //diceRenderer.sprite = greendiceSprites[finalValue - 1];
         if (CurrentPlayer == 1)
@@ -831,7 +992,10 @@ public class LudoDice2D : MonoBehaviour
     {
         //Debug.Log("InsideMovetoNextplayer");
         if (checking == true)
+        {
             turnchange(true);
+            Debug.Log("Changing turn");
+        }
         //currentPlayerIndex = (currentPlayerIndex + 1) % 4;
         //UpdateTurnDisplay();
         //allowInteraction = true;

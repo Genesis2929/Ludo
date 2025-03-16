@@ -154,4 +154,27 @@ public class BoardPath : MonoBehaviour
 
         pieceTransform.position = target;
     }
+
+    public void movetonewpos(GameObject gm, int newpos, int colornum)
+    {
+        Vector3 pos = Vector3.zero;
+        if(colornum == 0)
+        {
+            pos = greenwaypoints[newpos].position;
+        }
+        if (colornum == 1)
+        {
+            pos = yellowwaypoints[newpos].position;
+        }
+        if (colornum == 2)
+        {
+            pos = bluewaypoints[newpos].position;
+        }
+        if (colornum == 3)
+        {
+            pos = redwaypoints[newpos].position;
+        }
+
+        gm.transform.position = pos;
+    }
 }

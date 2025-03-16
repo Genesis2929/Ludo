@@ -29,6 +29,8 @@ public class optionscript : MonoBehaviour
    
     public static bool flingenable = true;
 
+    public static int difficultylevel = 1;
+
 
 
 

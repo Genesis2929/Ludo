@@ -4,6 +4,7 @@ using System.Collections;
 using UnityEngine.TextCore.Text;
 using UnityEngine.UIElements;
 using TMPro;
+using System.Net.NetworkInformation;
 
 public class PieceManager : MonoBehaviour
 {
@@ -104,6 +105,18 @@ public class PieceManager : MonoBehaviour
         LudoDice2D.OnDiceRollCompleted -= HandleDiceResult;
     }
     public bool threeconsecutivecut = false;
+
+    IEnumerator cutpiecefrom3oneorsix()
+    {
+        lastmovepiece.cutpiece(lastmovepiece.colornum, lastmovepiece.piecenumber, lastmovepiece.gameObject);
+        lastmovepiece.IsInBase = true;
+        yield return new WaitForSeconds(0.2f);
+
+        lastmovepiece.CurrentPosition = -1;
+        threeconsecutivecut = false;
+        StartCoroutine(delayfor5(1.5f));
+
+    }
     void HandleDiceResult(int playerIndex, int diceValue)
     {
         if(LudoDice2D.threeoneorsix)
@@ -119,15 +132,14 @@ public class PieceManager : MonoBehaviour
                         lastmovepiece.lastposition = lastmovepiece.CurrentPosition;
                         lastmovepiece.beforecurrrentposition = -1;
                         lastmovepiece.wasjustmoving = true;
-                        lastmovepiece.cutpiece(lastmovepiece.colornum, lastmovepiece.piecenumber, lastmovepiece.gameObject);
 
-                        lastmovepiece.IsInBase = true;
-                        lastmovepiece.CurrentPosition = -1;
-                        threeconsecutivecut = false;
+                        StartCoroutine(cutpiecefrom3oneorsix());
+
                     }
 
                 }
 
+                else
                 StartCoroutine(delayfor5(1.5f));
                 //diceSystem.EndTurn();
             }
@@ -188,7 +200,7 @@ public class PieceManager : MonoBehaviour
             AIpiecemove();
         }
     }
-
+    
     public void AIpiecemove()
     {
         if (LudoDice2D.isAIturn)
@@ -207,6 +219,12 @@ public class PieceManager : MonoBehaviour
                     if (movablePieces.Count > 0)
                     {
                         Debug.Log(123);
+                        if(optionscript.difficultylevel == 1)
+                        {
+                            profitcalculcation();
+                        }
+
+                        if(Piece.selectedpiece == null)
                         Piece.selectedpiece = movablePieces[Random.Range(0, movablePieces.Count)].gameObject;
                         Debug.Log(Piece.selectedpiece.name);
                         Piece.alreadyselected = true;
@@ -221,12 +239,104 @@ public class PieceManager : MonoBehaviour
         }
     }
 
+    public GameObject forprofitcalculation;
+    void profitcalculcation()
+    {
+        foreach (var piece in movablePieces)
+        {
+
+            int col = piece.colornum;
+            int cposition = piece.CurrentPosition;
+
+            int newposition = cposition + dicenum;
+
+            forprofitcalculation.SetActive(true);
+
+            boardPath.movetonewpos(forprofitcalculation, newposition, col);
+
+            CircleCollider2D colliderforpiece = forprofitcalculation.GetComponent<CircleCollider2D>();
+
+            Vector2 center = (Vector2)forprofitcalculation.transform.position + colliderforpiece.offset;
+
+            // Calculate the effective radius (account for scaling if needed).
+            float scale = Mathf.Max(forprofitcalculation.transform.lossyScale.x, forprofitcalculation.transform.lossyScale.y);
+            float radius = colliderforpiece.radius * scale;
+
+            Collider2D[] hits = Physics2D.OverlapCircleAll(center, radius);
+
+            foreach (Collider2D hit in hits)
+            {
+                // Ignore GameObject2 itself.
+                if (hit.gameObject == forprofitcalculation)
+                    continue;
+
+                //Debug.Log("GameObject2 collided with: " + hit.gameObject.name);
+
+                if (hit.gameObject.CompareTag("Piece"))
+                {
+                    if(piece.colornum != hit.gameObject.GetComponent<Piece>().colornum)
+                    {
+                        Piece.selectedpiece = piece.gameObject;
+
+                        return;
+                    }
+                }
+                // You can add any additional logic for handling the collision.
+            }
+
+        }
+
+        foreach (var piece in movablePieces)
+        {
+
+            int col = piece.colornum;
+            int cposition = piece.CurrentPosition;
+
+            int newposition = cposition + dicenum;
+
+            if(newposition == 56)
+            {
+                Piece.selectedpiece = piece.gameObject;
+                return;
+            }
+
+            //forprofitcalculation.SetActive(true);
+
+            //boardPath.movetonewpos(forprofitcalculation, newposition, col);
+        }
+
+
+
+        }
+
     void SetLayerForPieces(List<Piece> pieces, string layerName)
     {
+        List<int> curpos = new List<int>(); 
+        //int toppos = 0;
         int layer = LayerMask.NameToLayer(layerName);
         foreach (Piece piece in pieces)
         {
+            curpos.Add(piece.CurrentPosition);
+  
             piece.gameObject.layer = layer;
+      
+        }
+
+        for(int i = 0; i < curpos.Count; i++)
+        {
+            for(int j = i + 1; j<curpos.Count; j++)
+            {
+                if (curpos[j] == curpos[i])
+                {
+                    //same number
+
+                    if(pieces[i].toppositionnumber < pieces[j].toppositionnumber)
+                    {
+                        pieces[j].gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+                    }
+                }
+            }
+
         }
     }
     public void notouchinputforotherpiece(int whoseturn)
