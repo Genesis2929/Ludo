@@ -201,7 +201,7 @@ public class Piece : MonoBehaviour
         }
         else
         {
-            targetPiece.ispressedbyotherpiece = false;
+            targetPiece.ispressedbyotherpiece = true;
         }
 
         Debug.Log($"Swapped toppositionnumber between {gameObject.name} and {targetObject.name}");
