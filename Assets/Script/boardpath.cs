@@ -8,6 +8,10 @@ public class BoardPath : MonoBehaviour
     [SerializeField] private GameObject redwaypointgameobject;
     [SerializeField] private GameObject bluewaypointgameobject;
 
+    [SerializeField] private GameObject repeatyellowwaypointgameobject;
+    [SerializeField] private GameObject repeatgreenwaypointgameobject;
+    [SerializeField] private GameObject repeatredwaypointgameobject;
+    [SerializeField] private GameObject repeatbluewaypointgameobject;
 
     [SerializeField] private Transform[] yellowwaypoints;
     [SerializeField] private Transform[] greenwaypoints;
@@ -16,65 +20,141 @@ public class BoardPath : MonoBehaviour
 
     private void Start()
     {
-        waypointadd();
+
+        if(optionscript.mustcuttoenterhome)
+        {
+            waypointadd(true, false, false, false, false);
+        }
+        else
+        {
+            waypointadd(false, true, true, true, true);
+        }
     }
 
-    void waypointadd()
+    private void Update()
     {
-        if (yellowwaypointgameobject != null)
+        if(Piece.greenhavecut)
+        {
+            waypointadd(false, true, false, false, false);
+        }
+        if (Piece.yellowhavecut)
+        {
+            waypointadd(false, false, true, false, false);
+        }
+        if (Piece.bluehavecut)
+        {
+            waypointadd(false, false, false, true, false);
+        }
+        if (Piece.redhavecut)
+        {
+            waypointadd(false, false, false, false, true);
+        }
+    }
+    void waypointadd(bool changepath, bool green, bool yellow, bool blue, bool red)
+    {
+        GameObject g1 = null, g2 = null, g3 = null, g4 = null;
+        if(changepath)
+        {
+            g1 = repeatgreenwaypointgameobject; 
+            g2 = repeatyellowwaypointgameobject;
+            g3 = repeatredwaypointgameobject;
+            g4 = repeatbluewaypointgameobject;
+        }
+        else
+        {
+            if(green)
+            g1 = greenwaypointgameobject;
+            if(yellow)
+            g2 = yellowwaypointgameobject;
+            if(red)
+            g3 = redwaypointgameobject;
+            if(blue)
+            g4 = bluewaypointgameobject;
+        }
+        if (g2 != null)
         {
             int i = 0;
-            int childcount = yellowwaypointgameobject.transform.childCount;
+            int childcount = g2.transform.childCount;
             yellowwaypoints = new Transform[childcount];
             //waypoints.Length = waypointgameobject.transform.childCount;
-            foreach (Transform t in yellowwaypointgameobject.transform)
+            foreach (Transform t in g2.transform)
             {
                 yellowwaypoints[i] = t.gameObject.transform;
                 i++;
             }
         }
-        if (greenwaypointgameobject != null)
+        if (g1 != null)
         {
             int i = 0;
-            int childcount = greenwaypointgameobject.transform.childCount;
+            int childcount = g1.transform.childCount;
             greenwaypoints = new Transform[childcount];
             //waypoints.Length = waypointgameobject.transform.childCount;
-            foreach (Transform t in greenwaypointgameobject.transform)
+            foreach (Transform t in g1.transform)
             {
                 greenwaypoints[i] = t.gameObject.transform;
                 i++;
             }
         }
-        if (bluewaypointgameobject != null)
+        if (g4 != null)
         {
             int i = 0;
-            int childcount = bluewaypointgameobject.transform.childCount;
+            int childcount = g4.transform.childCount;
             bluewaypoints = new Transform[childcount];
             //waypoints.Length = waypointgameobject.transform.childCount;
-            foreach (Transform t in bluewaypointgameobject.transform)
+            foreach (Transform t in g4.transform)
             {
                 bluewaypoints[i] = t.gameObject.transform;
                 i++;
             }
         }
-        if (redwaypointgameobject != null)
+        if (g3 != null)
         {
             int i = 0;
-            int childcount = redwaypointgameobject.transform.childCount;
+            int childcount = g3.transform.childCount;
             redwaypoints = new Transform[childcount];
             //waypoints.Length = waypointgameobject.transform.childCount;
-            foreach (Transform t in redwaypointgameobject.transform)
+            foreach (Transform t in g3.transform)
             {
                 redwaypoints[i] = t.gameObject.transform;
                 i++;
             }
         }
     }
-    public bool CanMove(int currentPosition, int steps, int colornum)
+    public bool CanMove(int currentPosition, int steps, int colornum, Piece ps)
     {
         // Implement your game's specific movement rules
 
-
+        if(optionscript.mustcuttoenterhome)
+        {
+            if(ps.colornum == 0)
+            {
+                if(Piece.greenhavecut == false)
+                {
+                    return true;
+                }
+            }
+            else if (ps.colornum == 1)
+            {
+                if (Piece.yellowhavecut == false)
+                {
+                    return true;
+                }
+            }
+            else if (ps.colornum == 2)
+            {
+                if (Piece.bluehavecut == false)
+                {
+                    return true;
+                }
+            }
+            else if (ps.colornum == 3)
+            {
+                if (Piece.redhavecut == false)
+                {
+                    return true;
+                }
+            }
+        }
         if (colornum == 0)
         {
             return (currentPosition + steps) < greenwaypoints.Length;
@@ -96,23 +176,45 @@ public class BoardPath : MonoBehaviour
 
     public IEnumerator MovePieceAlongPath(Piece piece, int startPos, int endPos, float duration)
     {
+        //if(!piece.piecehavecut())
+        //{
+        //    endPos = endPos % 52;
+        //}
+
+        int newcheck = 0;
         for (int i = startPos + 1; i <= endPos; i++)
         {
-            if(piece.colornum == 0)
+            if(optionscript.mustcuttoenterhome)
             {
-                yield return MoveToWaypoint(piece.transform, greenwaypoints[i].position, duration / (endPos - startPos));
-            }
-            else if(piece.colornum == 1)
-            {
-                yield return MoveToWaypoint(piece.transform, yellowwaypoints[i].position, duration / (endPos - startPos));
-            }
-            else if(piece.colornum == 2)
-            {
-                yield return MoveToWaypoint(piece.transform, bluewaypoints[i].position, duration / (endPos - startPos));
+                if (!piece.piecehavecut())
+                {
+                    //endPos = endPos % 52;
+                    newcheck = i % 52;
+
+                }
+                else
+                    newcheck = i;
+
             }
             else
             {
-                 yield return MoveToWaypoint(piece.transform, redwaypoints[i].position, duration / (endPos - startPos));
+                newcheck = i;
+            }
+            if (piece.colornum == 0)
+            {
+                yield return MoveToWaypoint(piece.transform, greenwaypoints[newcheck].position, duration / (endPos - startPos));
+            }
+            else if(piece.colornum == 1)
+            {
+                yield return MoveToWaypoint(piece.transform, yellowwaypoints[newcheck].position, duration / (endPos - startPos));
+            }
+            else if(piece.colornum == 2)
+            {
+                yield return MoveToWaypoint(piece.transform, bluewaypoints[newcheck].position, duration / (endPos - startPos));
+            }
+            else
+            {
+                 yield return MoveToWaypoint(piece.transform, redwaypoints[newcheck].position, duration / (endPos - startPos));
 
             }
         }

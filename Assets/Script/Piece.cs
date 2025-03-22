@@ -21,9 +21,12 @@ public class Piece : MonoBehaviour
     public bool wasjustmoving = false;
 
 
+    public GameObject barriergameobject;
+
+
     public bool ispressedbyotherpiece = false;
 
-
+    public static bool redhavecut = false, greenhavecut = false, bluehavecut = false, yellowhavecut = false;
     //public List<Transform> homeposition = new List<Transform>();
     [Header("Visuals")]
     [SerializeField] private GameObject highlightEffect;
@@ -43,10 +46,29 @@ public class Piece : MonoBehaviour
     public int toppositionnumber = 0;
 
     public int olddictionaryposition = 0;
+    public static int redhomenum, greenhomenum, yellowhomenum, bluehomenum;
 
     public static Dictionary<int, List<GameObject>> samePosDictionary = new Dictionary<int, List<GameObject>>();
-
-    int currentposbasedoncolor(int cnum, int currentposnumber)
+    void havecutupdate()
+    {
+        if(colornum == 0)
+        {
+            greenhavecut = true;
+        }
+        else if(colornum == 1)
+        {
+            yellowhavecut = true;
+        }
+        else if(colornum == 2)
+        {
+            bluehavecut = true;
+        }
+        else
+        {
+            redhavecut = true;  
+        }
+    }
+    public int currentposbasedoncolor(int cnum, int currentposnumber)
     {
         Debug.Log("CNUM:" + cnum +":Currentposnumber:"+currentposnumber);
         int newnum = 0;
@@ -248,6 +270,10 @@ public class Piece : MonoBehaviour
         lastposition = CurrentPosition;
         olddictionaryposition = CurrentPosition;
         initialpiecesetup();
+        redhomenum = 0; 
+        greenhomenum = 0;
+        yellowhomenum = 0;
+        bluehomenum = 0;
 
     }
 
@@ -276,10 +302,48 @@ public class Piece : MonoBehaviour
             }
         }
     }
+
     void homereached()
     {
         //this.gameObject.GetComponent<Collider2D>().enabled = false;
         IsInHome = true;
+
+        if(colornum == 0)
+        {
+            greenhomenum++;
+
+            if(greenhomenum == optionscript.coinnumber)
+            {
+                
+            }
+        }
+        if (colornum == 1)
+        {
+            yellowhomenum++;
+
+            if (yellowhomenum == optionscript.coinnumber)
+            {
+
+            }
+        }
+        if (colornum == 2)
+        {
+            bluehomenum++;
+
+            if (bluehomenum == optionscript.coinnumber)
+            {
+
+            }
+        }
+        if (colornum == 3)
+        {
+            redhomenum++;
+
+            if (redhomenum == optionscript.coinnumber)
+            {
+
+            }
+        }
     }
 
     void initialpiecesetup()
@@ -411,6 +475,32 @@ public class Piece : MonoBehaviour
         //    listmaintain();
         //}
 
+
+        if(optionscript.barrier)
+        {
+            if(barrieron)
+            {
+                if(ismoving == false)
+                {
+                    if(forshowstar(true, CurrentPosition))
+                    {
+                        barrierbreak(false, null);
+                    }
+                    else
+                    {
+                        if (optionscript.showstar)
+                        {
+                            if (forshowstar(false, CurrentPosition))
+                            {
+                                barrierbreak(false, null);
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+
         if(PieceManager.lastmovepiece!= null)
         {
             if(PieceManager.lastmovepiece.gameObject != this.gameObject )
@@ -452,9 +542,28 @@ public class Piece : MonoBehaviour
         CurrentPosition = newPosition;
     }
 
-    private void OnMouseDown()
+    public bool piecehavecut()
     {
-
+        if(colornum == 0)
+        {
+            return greenhavecut;
+        }
+        else if (colornum == 1)
+        {
+            return yellowhavecut;
+        }
+        else if (colornum == 2)
+        {
+            return bluehavecut;
+        }
+        else
+        {
+            return redhavecut;
+        }
+    }
+    public void touchclick()
+    {
+        Debug.Log("OnMouseDOwn");
         //if(!LudoDice2D.isAIturn)
         if(LudoDice2D.numberofAI ==  0)
         {
@@ -473,8 +582,10 @@ public class Piece : MonoBehaviour
         {
             if(LudoDice2D.AIjustnumber != colornum)
             {
+                Debug.Log("OnMouseDOwn2");
                 if (PieceManager.selectedpiecemove)
                 {
+                Debug.Log("OnMouseDOwn3");
                     if (alreadyselected == false)
                     {
                         selectedpiece = gameObject;
@@ -555,76 +666,176 @@ public class Piece : MonoBehaviour
    public bool pendingListUpdate = false;
     public bool newpendingUpdate = false;
     public static bool endtriggeronetime = false;
-    void OnTriggerExit2D(Collider2D collision)
+    //void OnTriggerExit2D(Collider2D collision)
+    //{
+    //    if(beforecurrrentposition != lastposition)
+    //    {
+    //        if(endtriggeronetime == false)
+    //        {
+    //            int newnum = currentposbasedoncolor(colornum, lastposition);
+    //            if (collision.gameObject.CompareTag("Piece"))
+    //            {
+    //                //if (collision.gameObject.GetComponent<Piece>().colornum != colornum)
+
+    //                Piece ps1 = collision.gameObject.GetComponent<Piece>();
+    //                int newnum1 = currentposbasedoncolor(ps1.colornum, ps1.CurrentPosition);
+    //                Debug.Log(CurrentPosition + "CurrPos:" + olddictionaryposition + ":dictpos"+beforecurrrentposition+":BeforeCurrentpos:"+newnum+":newnum:"+newnum1+"newnum1"+gameObject.name+":Name:"+ps1.CurrentPosition);
+
+    //                if(optionscript.showstar)
+    //                {
+    //                    if(forshowstar(true, ps1.CurrentPosition) || forshowstar(false, ps1.CurrentPosition))
+    //                    {
+    //                        if (forshowstar(true, CurrentPosition) || forshowstar(false, CurrentPosition))
+    //                        {
+
+    //                        Debug.Log("Inside");
+    //                        //if(CurrentPosition != lastposition)
+    //                        //pendingListUpdate = true;
+    //                        newpendingUpdate = true;
+
+    //                        }
+    //                    }
+
+    //                }
+    //                else
+    //                {
+    //                    if (forshowstar(true, ps1.CurrentPosition))
+    //                    {
+    //                        if (forshowstar(true, CurrentPosition))
+    //                        {
+
+    //                            Debug.Log("Inside");
+    //                            //if(CurrentPosition != lastposition)
+    //                            //pendingListUpdate = true;
+    //                            newpendingUpdate = true;
+
+    //                        }
+    //                    }
+    //                }
+    //            }
+
+                    
+                
+    //            endtriggeronetime = true;
+    //        }
+
+    //    }
+    //}
+
+    //void FixedUpdate()
+    //{
+    //    if(newpendingUpdate)
+    //    {
+    //        if(ismoving == false)
+    //        {
+    //            pendingListUpdate = true;
+    //        }
+    //    }
+    //    //listmaintain();
+    //    if (pendingListUpdate)
+    //    {
+    //        Debug.Log("InsideUpdate:"+CurrentPosition + "CurrPos:" + olddictionaryposition + ":dictpos:" + beforecurrrentposition + ":BeforeCurrentpos:");
+    //        if (beforecurrrentposition != olddictionaryposition)
+    //        {
+    //            if(ismoving==false)
+    //            {
+    //                listmaintain();
+    //                pendingListUpdate = false;
+    //                newpendingUpdate = false;
+
+    //            }
+
+    //        }
+    //    }
+    //}
+
+    void forcollision(GameObject gm, Piece ps)
     {
-        if(beforecurrrentposition != lastposition)
+        SpriteRenderer[] pieceChildRenderers = gm.GetComponentsInChildren<SpriteRenderer>();
+
+        Debug.Log("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+
+        // Ensure that we have at least 2 child SpriteRenderers in the Piece object.
+        if (pieceChildRenderers.Length >= 1)
         {
-            if(endtriggeronetime == false)
+            // Get the child SpriteRenderer components from "certainpiece"
+            // Here we assume that "certainpiece" (this gameObject) has exactly two children.
+            SpriteRenderer childRenderer1 = transform.GetChild(0).GetComponent<SpriteRenderer>();
+            //SpriteRenderer childRenderer2 = transform.GetChild(1).GetComponent<SpriteRenderer>();
+
+            // Safety check in case one of the children is missing a SpriteRenderer.
+            if (childRenderer1 != null)
             {
-                int newnum = currentposbasedoncolor(colornum, lastposition);
-                if (collision.gameObject.CompareTag("Piece"))
-                {
-                    //if (collision.gameObject.GetComponent<Piece>().colornum != colornum)
+                // Assign the sorting order from the Piece's children to the corresponding children in "certainpiece".
+                //childRenderer1.sortingOrder = pieceChildRenderers[0].sortingOrder + 1;
+                //childRenderer2.sortingOrder = pieceChildRenderers[1].sortingOrder + 1;
+                //ps.gameObject.GetComponent<Collider2D>().enabled = false;
+                //ps.ispressedbyotherpiece = true;
+                //ps.toppositionnumber++;
 
-                    Piece ps1 = collision.gameObject.GetComponent<Piece>();
-                    int newnum1 = currentposbasedoncolor(ps1.colornum, ps1.CurrentPosition);
-                    Debug.Log(CurrentPosition + "CurrPos:" + olddictionaryposition + ":dictpos"+beforecurrrentposition+":BeforeCurrentpos:"+newnum+":newnum:"+newnum1+"newnum1"+gameObject.name+":Name:"+ps1.CurrentPosition);
-                    //if(CurrentPosition !=  olddictionaryposition)
-                    {
-                        //if (wasjustmoving)
-                        {
-                            if (ps1.CurrentPosition == 0 || ps1.CurrentPosition == 8 || ps1.CurrentPosition == 13
-        || ps1.CurrentPosition == 21 || ps1.CurrentPosition == 26 || ps1.CurrentPosition == 34
-        || ps1.CurrentPosition == 39 || ps1.CurrentPosition == 47)
-                            {
-                                if (CurrentPosition == 0 || CurrentPosition == 8 || CurrentPosition == 13
-            || CurrentPosition == 21 || CurrentPosition == 26 || CurrentPosition == 34
-            || CurrentPosition == 39 || CurrentPosition == 47)
-                                //if (ismoving == false)
-                                //if(newnum1 == newnum)
-                                {
 
-                                Debug.Log("Inside");
-                                //if(CurrentPosition != lastposition)
-                                //pendingListUpdate = true;
-                                newpendingUpdate = true;
+                //samepositionmaintainlist(ps.toppositionnumber, ps.gameObject, ps);
+                Debug.Log("PieceColornum:" + colornum + ":++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+                Debug.Log("Lastpos:" + lastposition + ":CurrentPostion:" + CurrentPosition + ":LastPieceMove:" + PieceManager.lastmovepiece);
+                lastposition = CurrentPosition;
 
-                                }
-                            }
-                        }
 
-                    }
-                }
-                endtriggeronetime = true;
             }
 
+            else
+            {
+                Debug.LogWarning("One or both children of 'certainpiece' are missing a SpriteRenderer component.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("The collided 'Piece' does not have enough child SpriteRenderers.");
         }
     }
 
-    void FixedUpdate()
+    bool forshowstar(bool mainstar, int curpos)
     {
-        if(newpendingUpdate)
+        if(mainstar)
         {
-            if(ismoving == false)
+            if (curpos == 0 || curpos == 13
+|| curpos == 26 || curpos == 39)
             {
-                pendingListUpdate = true;
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
-        //listmaintain();
-        if (pendingListUpdate)
+        else
         {
-            Debug.Log("InsideUpdate:"+CurrentPosition + "CurrPos:" + olddictionaryposition + ":dictpos:" + beforecurrrentposition + ":BeforeCurrentpos:");
-            if (beforecurrrentposition != olddictionaryposition)
+            if (curpos == 8 || curpos == 21
+|| curpos == 34 || curpos == 47)
             {
-                if(ismoving==false)
-                {
-                    listmaintain();
-                    pendingListUpdate = false;
-                    newpendingUpdate = false;
-
-                }
-
+                return true;
             }
+            else
+            {
+                return false;
+            }
+        }
+    }
+    public LudoDice2D dicesystem;
+    public int collidednum = 0;
+    
+    void sidesit(Piece gm)
+    {
+        Vector3 prepos = gm.gameObject.transform.position;
+        for(int i=0; i< gm.collidednum; i++)
+        {
+            int jn = -1;
+            int kn = 1;
+
+            if(i %2 != 0)
+            {
+                kn = 2 * kn;
+            }
+            gm.gameObject.transform.position = prepos + Mathf.Pow(jn, i+1) * new Vector3(0.02f, 0.02f, 0) *kn;
         }
     }
     void OnTriggerStay2D(Collider2D collision)
@@ -639,75 +850,105 @@ public class Piece : MonoBehaviour
                 if (collision.gameObject.CompareTag("Piece"))
                 {
                     Piece ps = collision.gameObject.GetComponent<Piece>();
+
+
+                    //if(ps.CurrentPosition == CurrentPosition)
+                    if (currentposbasedoncolor(colornum, CurrentPosition) == currentposbasedoncolor(ps.colornum, ps.CurrentPosition))
                     //if (colornum != ps.colornum)
                     {
                         if (ps.ismoving == false)
                         {
-                            if (CurrentPosition == 0 || CurrentPosition == 8 || CurrentPosition == 13
-                    || CurrentPosition == 21 || CurrentPosition == 26 || CurrentPosition == 34
-                    || CurrentPosition == 39 || CurrentPosition == 47)
+                    //        if (CurrentPosition == 0 || CurrentPosition == 8 || CurrentPosition == 13
+                    //|| CurrentPosition == 21 || CurrentPosition == 26 || CurrentPosition == 34
+                    //|| CurrentPosition == 39 || CurrentPosition == 47)
+                    if(forshowstar(true, CurrentPosition) == true)
                             {
                                 // Get all child SpriteRenderer components from the Piece object.
-                                SpriteRenderer[] pieceChildRenderers = collision.gameObject.GetComponentsInChildren<SpriteRenderer>();
-
-                                Debug.Log("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
-
-                                // Ensure that we have at least 2 child SpriteRenderers in the Piece object.
-                                if (pieceChildRenderers.Length >= 1)
-                                {
-                                    // Get the child SpriteRenderer components from "certainpiece"
-                                    // Here we assume that "certainpiece" (this gameObject) has exactly two children.
-                                    SpriteRenderer childRenderer1 = transform.GetChild(0).GetComponent<SpriteRenderer>();
-                                    //SpriteRenderer childRenderer2 = transform.GetChild(1).GetComponent<SpriteRenderer>();
-
-                                    // Safety check in case one of the children is missing a SpriteRenderer.
-                                    if (childRenderer1 != null)
-                                    {
-                                        // Assign the sorting order from the Piece's children to the corresponding children in "certainpiece".
-                                        //childRenderer1.sortingOrder = pieceChildRenderers[0].sortingOrder + 1;
-                                        //childRenderer2.sortingOrder = pieceChildRenderers[1].sortingOrder + 1;
-                                        //ps.gameObject.GetComponent<Collider2D>().enabled = false;
-                                        ps.ispressedbyotherpiece = true;
-                                        //ps.toppositionnumber++;
-
-                               
-                                        samepositionmaintainlist(ps.toppositionnumber, ps.gameObject, ps);
-                                        Debug.Log("PieceColornum:" + colornum+":++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-                                        Debug.Log("Lastpos:" + lastposition + ":CurrentPostion:" + CurrentPosition+":LastPieceMove:"+PieceManager.lastmovepiece);
-                                        lastposition = CurrentPosition;
-                                        
-
-                                    }
-
-                                    else
-                                    {
-                                        Debug.LogWarning("One or both children of 'certainpiece' are missing a SpriteRenderer component.");
-                                    }
-                                }
-                                else
-                                {
-                                    Debug.LogWarning("The collided 'Piece' does not have enough child SpriteRenderers.");
-                                }
+                                forcollision(collision.gameObject, ps);
+                                collidednum++;
+                                ps.collidednum++;
+                                sidesit(ps);
                             }
                             //    }
                             //if (collision.gameObject.CompareTag("Piece"))
                             //{
                             else
                             {
+                                if (optionscript.showstar)
+                                {
+                                    if (forshowstar(false, CurrentPosition) == true)
+                                    {
+                                        forcollision(collision.gameObject, ps);
+                                    }
+                                    else
+                                    {
+                                        if (colornum != ps.colornum)
+                                        {
+                                            cutpiece(ps.colornum, ps.piecenumber, ps.gameObject);
 
+                                            if (optionscript.barrier && ps.barrieron)
+                                            {
+                                                barrierbreak(true, ps);
+                                            }
+
+                                            ps.IsInBase = true;
+                                            ps.CurrentPosition = -1;
+                                            ps.lastposition = ps.CurrentPosition;
+
+                                            havecutupdate();
+
+                                            if (optionscript.cutgainturn)
+                                                homeorcutturn = true;
+
+
+                                            if (homeorcutturn)
+                                            {
+                                                dicesystem.homecutturning();
+                                            }
+
+                                        }
+                                        else
+                                        {
+                                            formbarrier(ps);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    if (colornum != ps.colornum)
+                                    {
+                                        cutpiece(ps.colornum, ps.piecenumber, ps.gameObject);
+
+                                        if(optionscript.barrier && ps.barrieron)
+                                        {
+                                            barrierbreak(true,ps);
+                                        }
+
+                                        ps.IsInBase = true;
+                                        ps.CurrentPosition = -1;
+                                        ps.lastposition = ps.CurrentPosition;
+
+                                        havecutupdate();
+
+                                        if (optionscript.cutgainturn)
+                                            homeorcutturn = true;
+
+                                        if(homeorcutturn)
+                                        {
+                                            dicesystem.homecutturning();
+                                        }
+
+                                        
+
+                                    }
+                                    else
+                                    {
+                                        formbarrier(ps);
+                                    }
+                                }
 
                                 //GameObject gobj = ps.gameObject;
-                                if (colornum != ps.colornum)
-                                {
-                                    cutpiece(ps.colornum, ps.piecenumber, ps.gameObject);
 
-                                    ps.IsInBase = true;
-                                    ps.CurrentPosition = -1;
-                                    ps.lastposition = ps.CurrentPosition;
-
-                                    homeorcutturn = true;
-
-                                }
 
                             }
 
@@ -721,7 +962,15 @@ public class Piece : MonoBehaviour
                 else if (collision.gameObject.CompareTag("Home"))
                 {
                     homereached();
-                    homeorcutturn = true;
+                    if(optionscript.homegainturn)
+                    {
+                         homeorcutturn = true;
+
+                    }
+                    if (homeorcutturn)
+                    {
+                        dicesystem.homecutturning();
+                    }
                 }
 
                 wasjustmoving = false;
@@ -729,7 +978,75 @@ public class Piece : MonoBehaviour
 
         }
     }
-    
+
+    public bool barrieron = false;
+    public bool pieceinsidepiece = false;
+    public static List<Piece> barrierpos = new List<Piece>();
+    public void formbarrier(Piece ps)
+    {
+        if(optionscript.barrier)
+        {
+            if(barrieron == false)
+            {
+                barrierpos.Add(gameObject.GetComponent<Piece>());
+                barrieron = true;
+                ps.barrieron = true;
+                //GameObject g1 = Instantiate(barriergameobject);
+                //g1.transform.position = transform.position;
+                ps.gameObject.transform.position = transform.position + new Vector3(0.05f , 0.05f ,0);
+
+                //gameObject.transform.SetParent(g1.transform);
+                ps.gameObject.transform.SetParent(gameObject.transform);
+                ps.pieceinsidepiece = true;
+                ps.gameObject.GetComponent<CircleCollider2D>().enabled = false;
+           
+
+                //ps.gameObject.GetComponent<Piece>().enabled = false;
+                //gameObject.GetComponent<Piece>().enabled = false;
+
+            }
+
+        }
+    }
+
+    public void barrierbreak(bool childcut, Piece pie)
+    {
+        GameObject childgm = null;
+        //barrierpos.Remove(gameObject.transform);
+        if (childcut)
+        {
+            barrierpos.Remove(pie);
+            pie.barrieron = false;
+            childgm = pie.gameObject.transform.GetChild(2).gameObject;
+        }
+        else
+        {
+            barrierpos.Remove(gameObject.GetComponent<Piece>());
+            barrieron = false;
+            childgm = gameObject.transform.GetChild(2).gameObject;
+            //gameObject.transform.SetParent(null);
+        }
+
+        GameObject parentobj =gameObject.transform.parent.gameObject;
+        Piece ps = childgm.GetComponent<Piece>();
+        ps.barrieron = false;
+
+        ps.gameObject.transform.position = transform.position;
+        ps.CurrentPosition = CurrentPosition;
+        ps.lastposition = ps.CurrentPosition;
+        ps.gameObject.transform.SetParent(parentobj.transform);
+        ps.pieceinsidepiece=false;
+        ps.gameObject.GetComponent<CircleCollider2D>().enabled = true;
+
+        if(childcut)
+        {
+            cutpiece(ps.colornum, ps.piecenumber, childgm);
+            ps.IsInBase = true;
+            ps.CurrentPosition = -1;
+            ps.lastposition = ps.CurrentPosition;
+        }
+        
+    }
     public void cutpiece(int colornumber, int piecenum, GameObject gobj)
     {
         if (colornumber == 3)

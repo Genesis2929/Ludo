@@ -47,34 +47,75 @@ public class PieceManager : MonoBehaviour
     public Dictionary<int, List<GameObject>> samePosDictionary = new Dictionary<int, List<GameObject>>();
     public List<GameObject> playerList = new List<GameObject>();
     public int currpos;
+
+    public static int rednum, greennum, bluenum , yellownum;
+    public int secondoneorsix;
     private void Start()
-    {
+    { 
+        rednum = 0; greennum = 0; bluenum = 0; yellownum = 0;
         if(greenpiece != null)
         {
             foreach(Transform children in greenpiece.transform)
             {
-                player1Pieces.Add(children.gameObject.GetComponent<Piece>());
+
+                if(greennum < optionscript.coinnumber)
+                {
+                    player1Pieces.Add(children.gameObject.GetComponent<Piece>());
+                    greennum++;
+                }
+                else
+                {
+                    children.gameObject.SetActive(false);
+                }
+
             }
         }
         if (yellowpiece != null)
         {
             foreach (Transform children in yellowpiece.transform)
             {
-                player2Pieces.Add(children.gameObject.GetComponent<Piece>());
+
+                if (yellownum < optionscript.coinnumber)
+                {
+                    player2Pieces.Add(children.gameObject.GetComponent<Piece>());
+                    yellownum++;
+
+                }
+                else
+                {
+                    children.gameObject.SetActive(false);
+                }
             }
         }
         if (bluepiece != null)
         {
             foreach (Transform children in bluepiece.transform)
             {
-                player3Pieces.Add(children.gameObject.GetComponent<Piece>());
+                if (bluenum < optionscript.coinnumber)
+                {
+                    player3Pieces.Add(children.gameObject.GetComponent<Piece>());
+                    bluenum++;
+                }
+                else
+                {
+                    children.gameObject.SetActive(false);
+                }
             }
         }
         if (redpiece != null)
         {
             foreach (Transform children in redpiece.transform)
             {
-                player4Pieces.Add(children.gameObject.GetComponent<Piece>());
+
+                if (rednum < optionscript.coinnumber)
+                {
+                    player4Pieces.Add(children.gameObject.GetComponent<Piece>());
+                    rednum++;
+                }
+                else
+                {
+                    children.gameObject.SetActive(false);
+                }
             }
         }
 
@@ -83,14 +124,20 @@ public class PieceManager : MonoBehaviour
         if (optionscript.startatoneorsix)
         {
             oneorsix = 6;
+            secondoneorsix = 1;
         }
         else
         {
             oneorsix = 1;
+            secondoneorsix = 6;
         }
     }
 
 
+    void coinnummatch()
+    {
+        
+    }
     //void dictioinaryshow()
     //{
     //    foreach(GameObject gm in Piece.samePosDictionary[Piece.Currentposit])
@@ -114,6 +161,8 @@ public class PieceManager : MonoBehaviour
 
         lastmovepiece.CurrentPosition = -1;
         threeconsecutivecut = false;
+
+        diceSystem.checkingturnandskip();
         StartCoroutine(delayfor5(1.5f));
 
     }
@@ -155,6 +204,7 @@ public class PieceManager : MonoBehaviour
         }
     }
 
+    public List<Piece> tocheckmovable = new List<Piece>();
     void handlingpiece(int playerIndex, int diceValue)
     {
         currentDiceValue = diceValue;
@@ -165,6 +215,7 @@ public class PieceManager : MonoBehaviour
         // Find movable pieces
         movablePieces = GetMovablePieces(currentPlayerPieces, diceValue);
         Debug.Log("GetMovablepieceinpiecemanager");
+        tocheckmovable = movablePieces;
 
         notouchinputforotherpiece(playerIndex);
 
@@ -172,6 +223,20 @@ public class PieceManager : MonoBehaviour
         {
             // No movable pieces - end turn
             //diceSystem.EndTurn();
+            if (lastmovepiece != null)
+            {
+                lastmovepiece.lastposition = lastmovepiece.CurrentPosition;
+                lastmovepiece.wasjustmoving = false;
+
+            }
+            foreach(Piece piece in currentPlayerPieces)
+            {
+                if(piece.CurrentPosition != -1)
+                {
+                    lastmovepiece = piece;
+                    break;
+                }
+            }
             StartCoroutine(delayfor5(1.5f));
             Debug.Log("No move");
 
@@ -198,6 +263,52 @@ public class PieceManager : MonoBehaviour
             dicenum = diceValue;
             AIroll = true;
             AIpiecemove();
+
+            if (optionscript.mustbringcoinout)
+            {
+                if (mustbringoutcheck(movablePieces))
+                {
+                    //if (!ps.IsInBase)
+                    {
+                        //punishment(ps);
+                        //StartCoroutine(punishment(ps));
+                        //Piece.alreadyselected = false;
+                        //Piece.selectedpiece = null;
+                        //selectedpiecemove = false;
+                        if (piecegm.gameObject != null)
+                        {
+                            Piece.selectedpiece = piecegm.gameObject;
+                            Piece.alreadyselected = true;
+                        }
+
+                        //ps = Piece.selectedpiece.GetComponent<Piece>();
+                    }
+                }
+            }
+
+            //if (optionscript.continueroll)
+            //{
+            //    continuerollon(diceValue);
+
+            //    if (diceValue == 2 || diceValue == 3 || diceValue == 4 || diceValue == 5 || diceValue == secondoneorsix)
+            //    {
+            //        if (optionscript.sixgiveanotherturn || optionscript.onealsogiveturn)
+            //        {
+            //            if (diceValue != secondoneorsix)
+            //            {
+            //                rollingfinish = true;
+            //            }
+            //            else
+            //            {
+            //                rollingfinish = false;
+            //            }
+            //        }
+            //        else
+            //        {
+            //            rollingfinish = true;
+            //        }
+            //    }
+            //}
         }
     }
     
@@ -221,7 +332,7 @@ public class PieceManager : MonoBehaviour
                         Debug.Log(123);
                         if(optionscript.difficultylevel == 1)
                         {
-                            profitcalculcation();
+                            profitcalculcation(false);
                         }
 
                         if(Piece.selectedpiece == null)
@@ -233,15 +344,50 @@ public class PieceManager : MonoBehaviour
 
 
                 }
+
+                if(optionscript.mustcuttable)
+                {
+                    profitcalculcation(true);
+                    //if(formustcutgameobject != null)
+                    if(formustcutlist.Count > 0)
+                    {
+                        int i = Random.Range(0, formustcutlist.Count);
+                        Piece.selectedpiece = formustcutlist[i];
+                    }
+                }
                 AIroll = false;
                 LudoDice2D.isAIturn = false;
             }
         }
     }
 
-    public GameObject forprofitcalculation;
-    void profitcalculcation()
+    List<int> storedicevalue = new List<int>();
+    bool rollingfinish = false;
+    void continuerollon(int dicevalue)
     {
+        storedicevalue.Add(dicevalue);
+        StartCoroutine(delayfor5(1.5f));
+    }
+    GameObject piecegm = null;
+    bool mustbringoutcheck(List<Piece> outpiece)
+    {
+        foreach(Piece piece in outpiece)
+        {
+            if(piece.IsInBase)
+            {
+                piecegm = piece.gameObject;
+                return true;
+            }
+        }
+        return false;
+    }
+    public GameObject forprofitcalculation;
+    public GameObject formustcutgameobject;
+    public List<GameObject> formustcutlist = new List<GameObject>();
+    void profitcalculcation(bool formustcut)
+    {
+        formustcutgameobject = null;
+        formustcutlist.Clear();
         foreach (var piece in movablePieces)
         {
 
@@ -250,8 +396,13 @@ public class PieceManager : MonoBehaviour
 
             int newposition = cposition + dicenum;
 
+            
+            if(checkingentertohome(piece) == true)
+            {
+                newposition = newposition % 52;
+            }
             forprofitcalculation.SetActive(true);
-
+            Debug.Log("CutCheck");
             boardPath.movetonewpos(forprofitcalculation, newposition, col);
 
             CircleCollider2D colliderforpiece = forprofitcalculation.GetComponent<CircleCollider2D>();
@@ -266,6 +417,7 @@ public class PieceManager : MonoBehaviour
 
             foreach (Collider2D hit in hits)
             {
+                Debug.Log("Colliderhit for profit!!!!!!!!!!!!!");
                 // Ignore GameObject2 itself.
                 if (hit.gameObject == forprofitcalculation)
                     continue;
@@ -276,33 +428,53 @@ public class PieceManager : MonoBehaviour
                 {
                     if(piece.colornum != hit.gameObject.GetComponent<Piece>().colornum)
                     {
-                        Piece.selectedpiece = piece.gameObject;
+                        if(formustcut == false)
+                        {
+                            Piece.selectedpiece = piece.gameObject;
+                            Debug.Log("AI Cuttable found!!!!!!!!!!!!!!!!!!!!!!!!!");
+                            return;
 
-                        return;
+                        }
+
+                        else
+                        {
+                            Debug.Log("Cuttable found!!!!!!!!!!!!!!!!!!!!!!!!!");
+                            formustcutgameobject = piece.gameObject;
+                            formustcutlist.Add(piece.gameObject);
+                        }
+
                     }
                 }
                 // You can add any additional logic for handling the collision.
             }
-
+            forprofitcalculation.SetActive(false);  
         }
 
-        foreach (var piece in movablePieces)
+        if(formustcut == false)
         {
-
-            int col = piece.colornum;
-            int cposition = piece.CurrentPosition;
-
-            int newposition = cposition + dicenum;
-
-            if(newposition == 56)
+            foreach (var piece in movablePieces)
             {
-                Piece.selectedpiece = piece.gameObject;
-                return;
-            }
+            if(piece.piecehavecut())
+                {
 
-            //forprofitcalculation.SetActive(true);
+                    int col = piece.colornum;
+                    int cposition = piece.CurrentPosition;
 
-            //boardPath.movetonewpos(forprofitcalculation, newposition, col);
+                    int newposition = cposition + dicenum;
+
+                    if(newposition == 56)
+                    {
+                        Piece.selectedpiece = piece.gameObject;
+                        return;
+                    }
+
+                    //forprofitcalculation.SetActive(true);
+
+                    //boardPath.movetonewpos(forprofitcalculation, newposition, col);
+                }
+                }
+
+
         }
 
 
@@ -372,50 +544,116 @@ public class PieceManager : MonoBehaviour
     }
 
     public bool selectablebool = false;
-    private void Update()
+    IEnumerator punishment(Piece ps)
     {
+        if (lastmovepiece != null)
+        {
+            lastmovepiece.lastposition = lastmovepiece.CurrentPosition;
+            lastmovepiece.wasjustmoving = false;
 
+        }
+        ps.beforecurrrentposition = -1;
+        ps.cutpiece(ps.colornum, ps.piecenumber, ps.gameObject);
+        ps.IsInBase = true;
+        yield return new WaitForSeconds(0.2f);
+
+        ps.CurrentPosition = -1;
+        //threeconsecutivecut = false;
+        Piece.alreadyselected = false;
+        Piece.selectedpiece = null;
+        selectedpiecemove = false;
+
+        lastmovepiece = ps;
+        StartCoroutine(delayfor5(1.5f));
+
+
+        //diceSystem.checkingturnandskip();
+        //StartCoroutine(delayfor5(1.5f));
+        AIenable = true;
+
+        selectablebool = false;
+    }
+
+    void forupdate()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            // Using Raycast, the first collider hit (based on internal order) will be returned.
+            RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
+            if (hit.collider != null)
+            {
+                if (hit.collider.CompareTag("Piece"))
+                {
+                    Debug.Log("Clicked on: " + hit.collider.gameObject.name);
+                    Piece hitps = hit.collider.gameObject.GetComponent<Piece>();
+
+                    hitps.touchclick();
+
+                }
+                // Optionally add your handling logic here
+            }
+        }
         if (Piece.alreadyselected)
         {
-            
+            Debug.Log("selectedupdate");
             Piece ps = Piece.selectedpiece.GetComponent<Piece>();
 
-            foreach(Piece piecemove in movablePieces)
+            foreach (Piece piecemove in movablePieces)
             {
-                if(piecemove.gameObject == ps.gameObject)
+                if (piecemove.gameObject == ps.gameObject)
                 {
                     selectablebool = true;
                 }
             }
-            if(selectablebool == false)
+            if (selectablebool == false)
             {
                 Piece.alreadyselected = false;
                 Piece.selectedpiece = null;
                 //selectedpiecemove = false;
+                Debug.Log("selectedupdate2");
                 return;
             }
-            Debug.Log("ColorNum"+ps.colornum+":colorchoose"+colorchoose);
-            if(ps.colornum == colorchoose)
+            Debug.Log("Selected");
+
+            if (optionscript.mustcuttable)
+            {
+                bool checkequal = false;
+                profitcalculcation(true);
+                //if (formustcutgameobject != null)
+                if (formustcutlist.Count > 0)
+                {
+                    //Piece.selectedpiece = formustcutgameobject;
+                    Debug.Log("selectedupdate3");
+                    foreach (GameObject gm in formustcutlist)
+                    {
+                        if (Piece.selectedpiece == gm)
+                        {
+                            Debug.Log("selectedupdate4");
+                            checkequal = true;
+                        }
+                    }
+                    if (checkequal == false)
+                    {
+                        StartCoroutine(punishment(ps));
+                        Piece.alreadyselected = false;
+                        Piece.selectedpiece = null;
+                        selectedpiecemove = false;
+                        return;
+                    }
+                }
+            }
+
+
+
+            Debug.Log("ColorNum" + ps.colornum + ":colorchoose" + colorchoose);
+            if (ps.colornum == colorchoose)
             {
                 if (ps.IsInBase == true)
                 {
-                    if(dicenum == oneorsix)
-                    {
-                        StartCoroutine(MovePiece(ps));
-
-                        Piece.alreadyselected = false;
-                        Piece.selectedpiece = null;
-                        selectedpiecemove=false;
-
-                    }
-                    else
-                    {
-                        Piece.alreadyselected = false;
-                    }
-                }
-                else
-                {
-                    if(!ps.IsInHome && boardPath.CanMove(ps.CurrentPosition, dicenum, ps.colornum))
+                    if (dicenum == oneorsix || (optionscript.sixalsobringcoinout && dicenum == 6) || (optionscript.onealsobringcoinout && dicenum == 1)
+                        || (optionscript.threesixstart && diceSystem.seconddicecounter == 3) || (optionscript.threeonestart && diceSystem.seconddicecounter == 3))
+                    //if (dicenum == oneorsix)
                     {
                         StartCoroutine(MovePiece(ps));
 
@@ -426,7 +664,23 @@ public class PieceManager : MonoBehaviour
                     }
                     else
                     {
-                        Piece.alreadyselected = false;  
+                        Piece.alreadyselected = false;
+                    }
+                }
+                else
+                {
+                    if (!ps.IsInHome && boardPath.CanMove(ps.CurrentPosition, dicenum, ps.colornum, ps))
+                    {
+                        StartCoroutine(MovePiece(ps));
+
+                        Piece.alreadyselected = false;
+                        Piece.selectedpiece = null;
+                        selectedpiecemove = false;
+
+                    }
+                    else
+                    {
+                        Piece.alreadyselected = false;
                     }
                 }
 
@@ -441,6 +695,27 @@ public class PieceManager : MonoBehaviour
             selectablebool = false;
         }
     }
+    private void Update()
+    {
+        //if((optionscript.continueroll))
+        //{
+        //    if(rollingfinish)
+        //    {
+        //        for (int i = 0; i < storedicevalue.Count; i++)
+        //        {
+        //            selectedpiecemove = true;
+        //            forupdate();
+
+        //        }
+
+        //    }
+        //}
+        //else
+        {
+            forupdate();
+        }
+        
+    }
     List<Piece> GetPlayerPieces(int playerIndex)
     {
         return playerIndex switch
@@ -453,30 +728,88 @@ public class PieceManager : MonoBehaviour
         };
     }
 
+    bool barrierbool = true;
+    void barriercheck(Piece ps, int dicevalue)
+    {
+        int actualpos = ps.currentposbasedoncolor(ps.colornum, ps.CurrentPosition);
+        int tarpos = (actualpos + dicevalue)%52;
+
+        foreach(Piece pieceslist in Piece.barrierpos)
+        {
+            int pieceslistpos = pieceslist.currentposbasedoncolor(pieceslist.colornum, pieceslist.CurrentPosition);
+
+            if (actualpos <= pieceslistpos && tarpos >= pieceslistpos)
+            {
+                barrierbool = false;
+            }
+            else if(actualpos >= pieceslistpos && tarpos <= pieceslistpos)
+            {
+                barrierbool = false;
+            }
+
+        }
+    }
+    bool checksamepiecepos(List<Piece> pieces, int post)
+    {
+        foreach(Piece piece in pieces)
+        {
+            if(piece.CurrentPosition == post)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
     List<Piece> GetMovablePieces(List<Piece> pieces, int diceValue)
     {
         List<Piece> movable = new List<Piece>();
 
         foreach (Piece piece in pieces)
         {
-            if(piece.ispressedbyotherpiece)
+            //if(piece.ispressedbyotherpiece)
+            //{
+            //    if(diceValue == oneorsix)
+            //    {
+            //        movable.Add(piece);
+            //    }
+            //}
+            //else
+
+            if(piece.barrieron)
             {
-                if(diceValue == oneorsix)
+                if(!piece.pieceinsidepiece)
                 {
-                    movable.Add(piece);
+                    if(diceValue % 2 == 0)
+                    {
+                        if(checksamepiecepos(pieces, piece.CurrentPosition + diceValue))
+                        movable.Add(piece); 
+                    }
+
                 }
             }
             else
             {
-                if (piece.IsInBase && diceValue == oneorsix)
+                if (piece.IsInBase)
                 {
-                    movable.Add(piece);
+                    if(optionscript.onealsobringcoinout && diceValue == 1|| optionscript.sixalsobringcoinout && diceValue == 6)
+                    {
+                        movable.Add(piece);
+                    }
+                    else
+                    {
+                        if (diceValue == oneorsix)
+                            movable.Add(piece);
+                    }
                 }
                 else if (!piece.IsInBase && !piece.IsInHome &&
-                       boardPath.CanMove(piece.CurrentPosition, diceValue, piece.colornum))
+                       boardPath.CanMove(piece.CurrentPosition, diceValue, piece.colornum, piece))
                 {
-
+                    barriercheck(piece, diceValue);
+                    Debug.Log("BarrierBool:"+barrierbool+";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;");
+                    if(barrierbool)
                     movable.Add(piece);
+
+                    barrierbool = true;
                 }
 
             }
@@ -518,6 +851,60 @@ public class PieceManager : MonoBehaviour
         StartCoroutine(MovePiece(selectedPiece));
     }
 
+    public bool checkingentertohome(Piece ps)
+    {
+        if (optionscript.mustcuttoenterhome)
+        {
+            if (ps.colornum == 0)
+            {
+                if (Piece.greenhavecut == false)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else if (ps.colornum == 1)
+            {
+                if (Piece.yellowhavecut == false)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else if (ps.colornum == 2)
+            {
+                if (Piece.bluehavecut == false)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else 
+            {
+                if (Piece.redhavecut == false)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
     IEnumerator MovePiece(Piece piece)
     {
 
@@ -530,28 +917,57 @@ public class PieceManager : MonoBehaviour
         }
         piece.wasjustmoving = true;
         lastmovepiece = piece;
-
+        piece.collidednum = 0;
         // Handle base exit
-        if(piece.ispressedbyotherpiece)
+        //if(piece.ispressedbyotherpiece)
+        //{
+        //    if(currentDiceValue == oneorsix)
+        //    {
+        //        piece.sameposswapping();
+        //    }
+        //}
+        //else
+        if(piece.barrieron)
         {
-            if(currentDiceValue == oneorsix)
+            piece.ismoving = false;
+            piece.lastposition = piece.CurrentPosition;
+
+            int targetPosition = piece.CurrentPosition + currentDiceValue / 2;
+            piece.beforecurrrentposition = targetPosition;
+
+            //if (checkingentertohome(piece) == true)
+            //{
+            //    targetPosition = targetPosition % 52;
+            //}
+
+            yield return boardPath.MovePieceAlongPath(piece, piece.CurrentPosition, targetPosition, moveDuration);
+            piece.SetPosition(targetPosition);
+            if (piece.CurrentPosition == targetPosition)
             {
-                piece.sameposswapping();
+                piece.ismoving = false;
+                Debug.Log("ismovingfalse");
             }
         }
         else
         {
-            if (piece.IsInBase && currentDiceValue == oneorsix)
+            if (piece.IsInBase)
             {
-                piece.ismoving = true;
-                piece.lastposition = piece.CurrentPosition;
-                piece.ExitBase();
-                piece.beforecurrrentposition = 0;
-                yield return boardPath.MovePieceToStart(piece, moveDuration);
-                if (piece.CurrentPosition == 0)
+                if(currentDiceValue == oneorsix || (optionscript.sixalsobringcoinout && currentDiceValue == 6) || (optionscript.onealsobringcoinout && currentDiceValue == 1))
                 {
-                    piece.ismoving = false;
-                    Debug.Log("ismovingfalse");
+                    piece.ismoving = true;
+                    piece.lastposition = piece.CurrentPosition;
+                    piece.ExitBase();
+                    piece.beforecurrrentposition = 0;
+
+                    //bool ch = checkingentertohome();
+
+                    yield return boardPath.MovePieceToStart(piece, moveDuration);
+                    if (piece.CurrentPosition == 0)
+                    {
+                        piece.ismoving = false;
+                        Debug.Log("ismovingfalse");
+                    }
+
                 }
             }
             else
@@ -561,6 +977,11 @@ public class PieceManager : MonoBehaviour
 
                 int targetPosition = piece.CurrentPosition + currentDiceValue;
                 piece.beforecurrrentposition = targetPosition;
+
+                //if (checkingentertohome(piece) == true)
+                //{
+                //    targetPosition = targetPosition % 52;
+                //}
                 //Debug.Log(piece.ismoving);
                 // Regular movement
                 yield return boardPath.MovePieceAlongPath(piece, piece.CurrentPosition, targetPosition, moveDuration);
