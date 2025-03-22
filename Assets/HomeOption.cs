@@ -101,12 +101,14 @@ public class HomeOption : MonoBehaviour
             if(PlayerPrefs.GetInt("Fling")== 1)
             {
                 fling = false;
-                flingimage.sprite = flingsprite;
+                //flingimage.sprite = flingsprite;
+                flingtext.text = "Fling";
             }
             else
             {
                 fling = true;
-                flingimage.sprite = touchsprite;
+                //flingimage.sprite = touchsprite;
+                flingtext.text = "Touch";
             }
         }
         else
@@ -119,12 +121,14 @@ public class HomeOption : MonoBehaviour
             if (PlayerPrefs.GetInt("Continueroll") == 1)
             {
                 cont = false;
-                contimage.sprite = contspriteon;
+                //contimage.sprite = contspriteon;
+                conttext.text = "On";
             }
             else
             {
                 cont = true;
-                contimage.sprite = contspriteoff;
+                //contimage.sprite = contspriteoff;
+                conttext.text = "Off";
             }
         }
         else
@@ -138,15 +142,18 @@ public class HomeOption : MonoBehaviour
              difflevel = PlayerPrefs.GetInt("Difflevel");
             if (PlayerPrefs.GetInt("Difflevel") == 0)
             {
-                diffimage.sprite = easy;
+                //diffimage.sprite = easy;
+                difftext.text = "Easy";
             }
             else if (PlayerPrefs.GetInt("Difflevel") == 1)
             {
-                diffimage.sprite = medium;
+                //diffimage.sprite = medium;
+                difftext.text = "Medium";
             }
             else
             {
-                diffimage.sprite = hard;
+                //diffimage.sprite = hard;
+                difftext.text = "Hard";
             }
         }
         else
@@ -450,10 +457,46 @@ public class HomeOption : MonoBehaviour
         //Debug.Log(PlayerPrefs.GetInt("AI4"));
     }
 
-
+    
     public void scenechange()
     {
-        SceneManager.LoadScene(1);
+        if (PlayerPrefs.HasKey("PlayerNumber"))
+        {
+            noofplayer = PlayerPrefs.GetInt("PlayerNumber");
+            if(noofplayer >= 2)
+            {
+                 SceneManager.LoadScene(1);
+            }
+            else
+            {
+                foreach(TMP_Text text in buttontext)
+                {
+                    GameObject gm = text.gameObject;
+                    Animator anim = gm.GetComponent<Animator>();
+
+                    if(anim != null)
+                    {
+                        Debug.Log("chaiba");
+
+                    }
+                    Debug.Log(gm.transform.parent.name);
+                    anim.SetTrigger("Textbuttonanim");
+
+
+                }
+            }
+        }
+        else
+        {
+            foreach (TMP_Text text in buttontext)
+            {
+                GameObject gm = text.gameObject;
+                Animator anim = gm.GetComponent<Animator>();
+                anim.SetTrigger("Textbuttonanim");
+
+
+            }
+        }
     }
 
 
@@ -500,20 +543,24 @@ public class HomeOption : MonoBehaviour
     public int difflevel = 2;
     public Image diffimage;
     public Sprite easy, medium, hard;
+    public TMP_Text difftext;
     public void difficultyset()
     {
         difflevel = (difflevel + 1) % 3;
         if(difflevel == 0)
         {
-            diffimage.sprite = easy;
+            //diffimage.sprite = easy;
+            difftext.text = "Easy";
         }
         else if(difflevel == 1)
         {
-            diffimage.sprite = medium;
+            //diffimage.sprite = medium;
+            difftext.text = "Medium";
         }
         else if (difflevel == 2)
         {
-            diffimage.sprite = hard;
+            //diffimage.sprite = hard;
+            difftext.text = "Hard";
         }
 
         PlayerPrefs.SetInt("Difflevel", difflevel);
@@ -522,20 +569,23 @@ public class HomeOption : MonoBehaviour
 
     public Image flingimage;
     public Sprite flingsprite, touchsprite;
+    public TMP_Text flingtext;
     bool fling = true;
     public void flingenable()
     {
         if(fling)
         {
 
-            flingimage.sprite = flingsprite;
+            //flingimage.sprite = flingsprite;
+            flingtext.text = "Fling";
             PlayerPrefs.SetInt("Fling", 1);
             PlayerPrefs.Save();
             fling = false;
         }
         else
         {
-            flingimage.sprite = touchsprite;
+            //flingimage.sprite = touchsprite;
+            flingtext.text = "Touch";
             PlayerPrefs.SetInt("Fling", 0);
             PlayerPrefs.Save();
             fling = true;
@@ -544,13 +594,15 @@ public class HomeOption : MonoBehaviour
 
     public Image contimage;
     public Sprite contspriteoff, contspriteon;
+    public TMP_Text conttext;
     bool cont = false;
     public void contenable()
     {
         if (cont)
         {
 
-            contimage.sprite = contspriteon;
+            //contimage.sprite = contspriteon;
+            conttext.text = "On";
             PlayerPrefs.SetInt("Continueroll", 1);
             PlayerPrefs.Save();
 
@@ -558,7 +610,8 @@ public class HomeOption : MonoBehaviour
         }
         else
         {
-            contimage.sprite = contspriteoff;
+            //contimage.sprite = contspriteoff;
+            conttext.text = "Off";
             PlayerPrefs.SetInt("Continueroll", 0);
             PlayerPrefs.Save();
             cont = true;

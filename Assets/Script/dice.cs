@@ -129,6 +129,7 @@ public class LudoDice2D : MonoBehaviour
         allowInteraction = true;
         thiscodecomplete = true;
         piecemanagercodecomplete = true;
+        AIjustnumber = AIplayernum1;
         //UpdateTurnDisplay();
     }
 
@@ -438,6 +439,7 @@ public class LudoDice2D : MonoBehaviour
 
     bool turnchangecheck = false;
     int checkturningruncount = 0;
+    int prevainum = 0;
     IEnumerator AIfunc(int numberofai)
     {
         if (allowInteraction == true && thiscodecomplete == true && piecemanagercodecomplete == true)
@@ -455,15 +457,9 @@ public class LudoDice2D : MonoBehaviour
 
             //Debug.Log("A1");
 
-            if (firstime == 0)
-            {
-                AIjustnumber = AIplayernum1;
-                firstime++;
-            }
-            if (currentPlayerIndex != AIjustnumber)
-            {
-                isAI = false;
-            }
+
+
+
             //if (currentPlayerIndex != AIjustnumber)
             //{
             //    isAI = false;
@@ -474,7 +470,21 @@ public class LudoDice2D : MonoBehaviour
 
             if (currentPlayerIndex == AIjustnumber)
             {
-                Debug.Log("A2");
+                if (firstime == 0)
+                {
+                    AIjustnumber = AIplayernum1;
+                    firstime++;
+                }
+                else
+                {
+                    if (noofAI > 1)
+                        if (currentPlayerIndex == prevainum)
+                        {
+                            isAI = true;
+                        }
+
+                }
+                Debug.Log("A2"+prevainum);
                 oneofai = false;
                 thiscodecomplete = false;
                 piecemanagercodecomplete = false;
@@ -496,12 +506,8 @@ public class LudoDice2D : MonoBehaviour
                         dicenumberchange();
                         dicecount++;
 
-                        //if (checkturningruncount == 0)
-                        {
-                         
-                            //checkturningruncount++;
-                        }
 
+                        prevainum = AIjustnumber;
                         //PieceManager.AIenable = false;
                         AIforPieceManagerNumber = AIjustnumber;
                         if (turnchangecheck == false)
@@ -546,9 +552,17 @@ public class LudoDice2D : MonoBehaviour
                     else
                     {
 
-                        isAI = true;
+                        //isAI = true;
                     }
+                    if (turnchangecheck)
+                    {
+                        turnchangecheck = false;
+                    }
+                    else
+                    {
 
+                        AIsubfunc(numberofai, true);
+                    }
 
                 }
                 else
@@ -558,15 +572,7 @@ public class LudoDice2D : MonoBehaviour
 
                 }
 
-                if(turnchangecheck)
-                {
-                    turnchangecheck = false;
-                }
-                else
-                {
-
-                    AIsubfunc(numberofai, true);
-                }
+                isAI= false;
 
             }
             //else if(oneofai == false)
