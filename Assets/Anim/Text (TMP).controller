@@ -31,7 +31,7 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
-    m_ConditionEvent: Textbuttonanim 0
+    m_ConditionEvent: Textanim
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 7128902740614394164}
@@ -81,7 +81,7 @@ AnimatorController:
   m_Name: Text (TMP)
   serializedVersion: 5
   m_AnimatorParameters:
-  - m_Name: Textbuttonanim 0
+  - m_Name: Textanim
     m_Type: 9
     m_DefaultFloat: 0
     m_DefaultInt: 0

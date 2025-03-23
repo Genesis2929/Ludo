@@ -444,26 +444,6 @@ public class LudoDice2D : MonoBehaviour
     {
         if (allowInteraction == true && thiscodecomplete == true && piecemanagercodecomplete == true)
         {
-          //Debug.Log("Interaction:" + allowInteraction + ":CodeComplete?:" + thiscodecomplete + "PieceManagerCodeComplete??:" + piecemanagercodecomplete);
-
-            //Debug.Log("startagaininteraction");
-            //allowInteraction = false;
-
-            //if(allowinteractionnumber == 0)
-            //{
-            //    allowinteractionnumber++;
-            //}
-
-
-            //Debug.Log("A1");
-
-
-
-
-            //if (currentPlayerIndex != AIjustnumber)
-            //{
-            //    isAI = false;
-            //}
 
             //Debug.Log("In AIfunc at start:" + "Currentplayerindex:" + currentPlayerIndex + ":AIjustnumber:" + AIjustnumber);
             Debug.Log("CurrentPlayerAndAIjustnumber:" + currentPlayerIndex + ":" + AIjustnumber + ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
@@ -679,6 +659,7 @@ public class LudoDice2D : MonoBehaviour
     int diffcurnum = -1;
     public void Update()
     {
+        //collisioncheckbool = false;
         //Debug.Log("Update"+touchrollbool);
         if (touchrollbool)
         {
@@ -706,6 +687,48 @@ public class LudoDice2D : MonoBehaviour
 
 
     }
+
+    public bool collisiontruepiece = false;
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        //if(collisioncheckbool)
+        {
+            if (collision.gameObject.CompareTag("Piece"))
+            {
+                Debug.Log("Colision::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+                //SetTransparency(0.5f); // Reduce transparency (0.5 means 50% transparent)
+                collisiontruepiece = true;
+            }
+
+        }
+        //else
+        //{
+        //    SetTransparency(1f);
+        //}
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Piece"))
+        {
+            //Debug.Log("23432Colision::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+            //SetTransparency(1f); // Restore full opacity
+            collisiontruepiece = false;
+
+        }
+    }
+
+    public void SetTransparency(float alpha)
+    {
+        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null)
+        {
+            Color color = spriteRenderer.color;
+            color.a = Mathf.Clamp(alpha, 0f, 1f);
+            spriteRenderer.color = color;
+        }
+    }
+
 
     private int[] weightedDice = new int[] { 1, 2, 3, 1, 4, 5, 6, 6 };
 
@@ -975,7 +998,7 @@ public class LudoDice2D : MonoBehaviour
             }
         }
 
-        if (optionscript.other3timesskip)
+        if (optionscript.threesixstart || optionscript.threeonestart)
         {
             if (finalValue == secondoneorsix)
             {
@@ -994,6 +1017,8 @@ public class LudoDice2D : MonoBehaviour
             }
         }
     }
+
+    public bool collisioncheckbool = false;
     IEnumerator RollDice()
     {
         isRolling = true;
@@ -1003,6 +1028,7 @@ public class LudoDice2D : MonoBehaviour
 
         // Dice rolling animation
         float animInterval = rollDuration / rollAnimFrames;
+        //collisioncheckbool = false;
         //Debug.Log("Currentplayer" + CurrentPlayer + "CurrentPlayerIndex:" + currentPlayerIndex);
         for (int i = 0; i < rollAnimFrames; i++)
         {
@@ -1030,8 +1056,11 @@ public class LudoDice2D : MonoBehaviour
             yield return new WaitForSeconds(animInterval);
         }
 
-
-
+        //collisioncheckbool = true;
+        if(collisiontruepiece == true)
+        {
+            SetTransparency(0.7f);
+        }
         // Get final result
         if (oneappeardice == false)
         {
@@ -1046,7 +1075,7 @@ public class LudoDice2D : MonoBehaviour
         {
             finalValue = oneorsix;
         }
-       // finalValue = 1;
+       //finalValue = 6;
         //finalValue = 1; ///////////////////////////////////////////////////////////
 
         consecutivecount();

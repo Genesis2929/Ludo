@@ -3,6 +3,7 @@ using TMPro;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Unity.VisualScripting;
 public class HomeOption : MonoBehaviour
 {
     //public List<TMP_Text> selectplayertext = new List<TMP_Text>();
@@ -84,12 +85,16 @@ public class HomeOption : MonoBehaviour
                 selectdiceone.SetActive(true);
                 selectdicesix.SetActive(false);
                 onesix = false;
+
+                oneorsixtext(true);
             }
             else
             {
                 selectdiceone.SetActive(false);
                 selectdicesix.SetActive(true);
                 onesix = true;
+
+                oneorsixtext(false);
             }
         }
         else
@@ -474,13 +479,16 @@ public class HomeOption : MonoBehaviour
                     GameObject gm = text.gameObject;
                     Animator anim = gm.GetComponent<Animator>();
 
-                    if(anim != null)
-                    {
-                        Debug.Log("chaiba");
+                    //if(anim != null)
+                    //{
+                    //    Debug.Log("chaiba");
 
-                    }
-                    Debug.Log(gm.transform.parent.name);
-                    anim.SetTrigger("Textbuttonanim");
+                    //}
+                    //Debug.Log(gm.transform.parent.name);
+                    anim.SetTrigger("Textanim");
+                    //anim.SetBool("boolanime", true);
+                    //anim.SetBool("boolanime", false);
+
 
 
                 }
@@ -492,7 +500,8 @@ public class HomeOption : MonoBehaviour
             {
                 GameObject gm = text.gameObject;
                 Animator anim = gm.GetComponent<Animator>();
-                anim.SetTrigger("Textbuttonanim");
+                //anim.SetTrigger("Textbuttonanim");
+                anim.SetTrigger("Textanim");
 
 
             }
@@ -640,8 +649,32 @@ public class HomeOption : MonoBehaviour
         }
 
         UpdateAllRules();
+        oneorsixtext(oneorsix);
     }
 
+    public TMP_Text rule1text, rule2text, rule4text, rule5text, rule6text, rule11text;
+
+    void oneorsixtext(bool oneorsix)
+    {
+        if(oneorsix)
+        {
+            rule1text.text = "6 gives another turn";
+            rule2text.text = "6 also brings a coin out";
+            rule4text.text = "3 consecutive rolls of 1 cuts one own coin";
+            rule5text.text = "Skip a turn on 3 consecutive rolls of 1";
+            rule6text.text = "3 consecutive rolls of 6 brings a coin out";
+            rule11text.text = "Must bring a coin out on 1";
+        }
+        else
+        {
+            rule1text.text = "1 gives another turn";
+            rule2text.text = "1 also brings a coin out";
+            rule4text.text = "3 consecutive rolls of 6 cuts one own coin";
+            rule5text.text = "Skip a turn on 3 consecutive rolls of 6";
+            rule6text.text = "3 consecutive rolls of 1 brings a coin out";
+            rule11text.text = "Must bring a coin out on 6";
+        }
+    }
     public void UpdateAllRules()
     {
         // --- Rule 1 ---
@@ -656,6 +689,11 @@ public class HomeOption : MonoBehaviour
         else
         {
             rule1image.sprite = wrongsprite;
+            rule2 = false;
+            rule2text.color = Color.gray;
+            rule6 = false;
+            rule6text.color = Color.gray;
+
             if (!onesix)
                 PlayerPrefs.SetInt("SixTurn", 0);
             else
@@ -666,6 +704,9 @@ public class HomeOption : MonoBehaviour
         if (rule2)
         {
             rule2image.sprite = rightsprite;
+            rule6 = false;
+            rule6text.color = Color.gray;
+            
             if (!onesix)
             {
                 PlayerPrefs.SetInt("SixOut", 1);
@@ -969,8 +1010,63 @@ public class HomeOption : MonoBehaviour
     }
 
 
+    void rule6func()
+    {
+        if(rule1 == true && rule2 == false)
+        {
+            if(rule6 == false)
+            {
+                rule6 = true;
+                rule6image.sprite = rightsprite;
 
-    public bool rule1 = false, rule2 = false, rule3 = false, rule4 = false, rule5 = false, rule6 = false, rule7 = false, rule8 = false, rule9 = false, rule10 = false, rule11 = false, rule12 = false;
+                if (onesix == false)
+                {
+                    PlayerPrefs.SetInt("3sixout", 1);
+                    PlayerPrefs.Save();
+                }
+                else
+                {
+                    PlayerPrefs.SetInt("3oneout", 1);
+                    PlayerPrefs.Save();
+                }
+            }
+            else
+            {
+                rule6 = false;
+                rule6image.sprite = wrongsprite;
+
+                if (onesix == false)
+                {
+                    PlayerPrefs.SetInt("3sixout", 0);
+                    PlayerPrefs.Save();
+                }
+                else
+                {
+                    PlayerPrefs.SetInt("3oneout", 0);
+                    PlayerPrefs.Save();
+                }
+            }
+        }
+        else if((rule1 == true && rule2 == true) || rule1 == false)
+        {
+            rule6 = false;
+            rule6image.sprite = wrongsprite;
+
+            if (onesix == false)
+            {
+                PlayerPrefs.SetInt("3sixout", 0);
+                PlayerPrefs.Save();
+            }
+            else
+            {
+                PlayerPrefs.SetInt("3oneout", 0);
+                PlayerPrefs.Save();
+            }
+        }
+        
+    }
+
+    public bool rule1 = true, rule2 = false, rule3 = true, rule4 = true, rule5 = false, rule6 = false, rule7 = true, rule8 = true, rule9 = false, rule10 = false, rule11 = false, rule12 = false;
     public Image rule1image, rule2image, rule3image, rule4image, rule5image, rule6image, rule7image, rule8image, rule9image, rule10image, rule11image, rule12image;
     public Sprite rightsprite, wrongsprite;
     public void gamerule(int ruleno)
@@ -981,7 +1077,8 @@ public class HomeOption : MonoBehaviour
             {
                 rule1 = true;
                 rule1image.sprite = rightsprite;
-                if(onesix == false)
+                rule2text.color = Color.black;
+                if (onesix == false)
                 {
                     PlayerPrefs.SetInt("SixTurn", 1);
                     PlayerPrefs.Save();
@@ -991,14 +1088,34 @@ public class HomeOption : MonoBehaviour
                     PlayerPrefs.SetInt("OneTurn", 1);
                     PlayerPrefs.Save();
                 }
+
+                if(rule2 == false)
+                {
+                    rule6text.color = Color.black;
+                }
             }
             else
             {
                 rule1 = false;
                 rule1image.sprite = wrongsprite;
+
+                rule2 = false;
+                rule2image.sprite = wrongsprite;
+                rule2text.color = Color.gray;
+
+                rule6image.sprite = wrongsprite;
+
+                rule6text.color = Color.gray;
+                rule6 = false;
+
                 if (onesix == false)
                 {
                     PlayerPrefs.SetInt("SixTurn", 0);
+                    PlayerPrefs.Save();
+                    PlayerPrefs.SetInt("SixOut", 0);
+                    PlayerPrefs.Save();
+
+                    PlayerPrefs.SetInt("3sixout", 0);
                     PlayerPrefs.Save();
 
                 }
@@ -1006,42 +1123,82 @@ public class HomeOption : MonoBehaviour
                 {
                     PlayerPrefs.SetInt("OneTurn", 0);
                     PlayerPrefs.Save();
+                    PlayerPrefs.SetInt("OneOut", 0);
+                    PlayerPrefs.Save();
+
+
+                    PlayerPrefs.SetInt("3oneout", 0);
+                    PlayerPrefs.Save();
                 }
             }
         }
         else if (ruleno == 2)
         {
-            if (rule2 == false)
+            if(rule1 == true)
             {
-                rule2 = true;
-                rule2image.sprite = rightsprite;
-
-                if (onesix == false)
+                if (rule2 == false)
                 {
-                    PlayerPrefs.SetInt("SixOut", 1);
-                    PlayerPrefs.Save();
+                    rule2 = true;
+                    rule2image.sprite = rightsprite;
+                    rule6image.sprite = wrongsprite;
 
-                    rule1 = true;
-                    rule1image.sprite = rightsprite;
-                    PlayerPrefs.SetInt("SixTurn", 1);
-                    PlayerPrefs.Save();
-                    
+                    rule6text.color = Color.gray;
+                    rule6 = false;
+
+                    if (onesix == false)
+                    {
+                        PlayerPrefs.SetInt("SixOut", 1);
+                        PlayerPrefs.Save();
+
+                        rule1 = true;
+                        rule1image.sprite = rightsprite;
+                        PlayerPrefs.SetInt("SixTurn", 1);
+                        PlayerPrefs.Save();
+
+                        PlayerPrefs.SetInt("3sixout", 0);
+                        PlayerPrefs.Save();
+
+                    }
+                    else
+                    {
+                        PlayerPrefs.SetInt("OneOut", 1);
+                        PlayerPrefs.Save();
+
+                        rule1 = true;
+                        rule1image.sprite  = rightsprite;
+                        PlayerPrefs.SetInt("OneTurn", 1);
+                        PlayerPrefs.Save();
+
+                        PlayerPrefs.SetInt("3oneout", 0);
+                        PlayerPrefs.Save();
+                    }
                 }
                 else
                 {
-                    PlayerPrefs.SetInt("OneOut", 1);
-                    PlayerPrefs.Save();
+                    rule2 = false;
+                    rule2image.sprite = wrongsprite;
 
-                    rule1 = true;
-                    rule1image.sprite  = rightsprite;
-                    PlayerPrefs.SetInt("OneTurn", 1);
-                    PlayerPrefs.Save();
+                    rule6text.color = Color.black;
+
+
+                    if (onesix == false)
+                    {
+                        PlayerPrefs.SetInt("SixOut", 0);
+                        PlayerPrefs.Save();
+                    }
+                    else
+                    {
+                        PlayerPrefs.SetInt("OneOut", 0);
+                        PlayerPrefs.Save();
+                    }
                 }
+
             }
             else
             {
                 rule2 = false;
                 rule2image.sprite = wrongsprite;
+                rule6text.color = Color.gray;
 
                 if (onesix == false)
                 {
@@ -1143,55 +1300,57 @@ public class HomeOption : MonoBehaviour
         }
         else if (ruleno == 6)
         {
-            if (rule6 == false)
-            {
-                if(rule2 == false)
-                {
-                    rule6 = true;
-                    rule6image.sprite = rightsprite;
+            rule6func();
+            //if (rule6 == false)
+            //{
+            //    if(rule2 == false)
+            //    {
+            //        rule6 = true;
+            //        rule6image.sprite = rightsprite;
 
-                    if (onesix == false)
-                    {
-                        PlayerPrefs.SetInt("3sixout", 1);
-                        PlayerPrefs.Save();
-                    }
-                    else
-                    {
-                        PlayerPrefs.SetInt("3oneout", 1);
-                        PlayerPrefs.Save();
-                    }
-                }
-                else
-                {
-                    rule6 = false;
-                    rule6image.sprite = wrongsprite;
-                    if (onesix == false)
-                    {
-                        PlayerPrefs.SetInt("3sixout", 0);
-                        PlayerPrefs.Save();
-                    }
-                    else
-                    {
-                        PlayerPrefs.SetInt("3oneout", 0);
-                        PlayerPrefs.Save();
-                    }
-                }
-            }
-            else
-            {
-                rule6 = false;
-                rule6image.sprite = wrongsprite;
-                if (onesix == false)
-                {
-                    PlayerPrefs.SetInt("3sixout", 0);
-                    PlayerPrefs.Save();
-                }
-                else
-                {
-                    PlayerPrefs.SetInt("3oneout", 0);
-                    PlayerPrefs.Save();
-                }
-            }
+            //        if (onesix == false)
+            //        {
+            //            PlayerPrefs.SetInt("3sixout", 1);
+            //            PlayerPrefs.Save();
+            //        }
+            //        else
+            //        {
+            //            PlayerPrefs.SetInt("3oneout", 1);
+            //            PlayerPrefs.Save();
+            //        }
+            //    }
+            //    else
+            //    {
+            //        rule6 = false;
+            //        rule6image.sprite = wrongsprite;
+
+            //        if (onesix == false)
+            //        {
+            //            PlayerPrefs.SetInt("3sixout", 0);
+            //            PlayerPrefs.Save();
+            //        }
+            //        else
+            //        {
+            //            PlayerPrefs.SetInt("3oneout", 0);
+            //            PlayerPrefs.Save();
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    rule6 = false;
+            //    rule6image.sprite = wrongsprite;
+            //    if (onesix == false)
+            //    {
+            //        PlayerPrefs.SetInt("3sixout", 0);
+            //        PlayerPrefs.Save();
+            //    }
+            //    else
+            //    {
+            //        PlayerPrefs.SetInt("3oneout", 0);
+            //        PlayerPrefs.Save();
+            //    }
+            //}
         }
         else if (ruleno == 7)
         {

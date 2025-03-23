@@ -793,7 +793,7 @@ public class Piece : MonoBehaviour
         }
     }
 
-    bool forshowstar(bool mainstar, int curpos)
+   public bool forshowstar(bool mainstar, int curpos)
     {
         if(mainstar)
         {
@@ -982,6 +982,7 @@ public class Piece : MonoBehaviour
     public bool barrieron = false;
     public bool pieceinsidepiece = false;
     public static List<Piece> barrierpos = new List<Piece>();
+    public List<Piece> barrierposition = new List<Piece>();
     public void formbarrier(Piece ps)
     {
         if(optionscript.barrier)
@@ -989,6 +990,7 @@ public class Piece : MonoBehaviour
             if(barrieron == false)
             {
                 barrierpos.Add(gameObject.GetComponent<Piece>());
+                barrierposition = barrierpos;
                 barrieron = true;
                 ps.barrieron = true;
                 //GameObject g1 = Instantiate(barriergameobject);
@@ -1037,8 +1039,9 @@ public class Piece : MonoBehaviour
         ps.gameObject.transform.SetParent(parentobj.transform);
         ps.pieceinsidepiece=false;
         ps.gameObject.GetComponent<CircleCollider2D>().enabled = true;
+        barrierposition = barrierpos;
 
-        if(childcut)
+        if (childcut)
         {
             cutpiece(ps.colornum, ps.piecenumber, childgm);
             ps.IsInBase = true;

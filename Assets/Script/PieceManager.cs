@@ -205,6 +205,7 @@ public class PieceManager : MonoBehaviour
     }
 
     public List<Piece> tocheckmovable = new List<Piece>();
+    bool coinoutboolenable = false;
     void handlingpiece(int playerIndex, int diceValue)
     {
         currentDiceValue = diceValue;
@@ -256,6 +257,11 @@ public class PieceManager : MonoBehaviour
             // Multiple pieces - enable selection
             //EnablePieceSelection(movablePieces);
             AIenable=false;
+            diceSystem.collisioncheckbool = true;
+            //if(diceSystem.collisiontruepiece == true)
+            //{
+            //    diceSystem.SetTransparency(0.55f);
+            //}
             dicecollider.enabled = false;
             selectedpiecemove = true;
             colorchoose = playerIndex;
@@ -279,6 +285,7 @@ public class PieceManager : MonoBehaviour
                         {
                             Piece.selectedpiece = piecegm.gameObject;
                             Piece.alreadyselected = true;
+                            coinoutboolenable = true;
                         }
 
                         //ps = Piece.selectedpiece.GetComponent<Piece>();
@@ -404,16 +411,37 @@ public class PieceManager : MonoBehaviour
             forprofitcalculation.SetActive(true);
             Debug.Log("CutCheck");
             boardPath.movetonewpos(forprofitcalculation, newposition, col);
-
             CircleCollider2D colliderforpiece = forprofitcalculation.GetComponent<CircleCollider2D>();
-
             Vector2 center = (Vector2)forprofitcalculation.transform.position + colliderforpiece.offset;
 
-            // Calculate the effective radius (account for scaling if needed).
-            float scale = Mathf.Max(forprofitcalculation.transform.lossyScale.x, forprofitcalculation.transform.lossyScale.y);
+            // Calculate radius (handle scaling)
+            float scale = Mathf.Max(
+                Mathf.Abs(forprofitcalculation.transform.lossyScale.x),
+                Mathf.Abs(forprofitcalculation.transform.lossyScale.y)
+            );
             float radius = colliderforpiece.radius * scale;
 
-            Collider2D[] hits = Physics2D.OverlapCircleAll(center, radius);
+            // Layer mask for "Ignore Raycast"
+            LayerMask layerMask = LayerMask.GetMask("Ignore Raycast");
+            Collider2D[] hits = Physics2D.OverlapCircleAll(center, radius, layerMask);
+
+            // Debug output
+            Debug.Log($"Hits: {hits.Length}");
+            foreach (Collider2D hit in hits)
+            {
+                Debug.Log($"Hit: {hit.gameObject.name} (Layer: {LayerMask.LayerToName(hit.gameObject.layer)})");
+            }
+            //CircleCollider2D colliderforpiece = forprofitcalculation.GetComponent<CircleCollider2D>();
+
+            //Vector2 center = (Vector2)forprofitcalculation.transform.position + colliderforpiece.offset;
+
+            //// Calculate the effective radius (account for scaling if needed).
+            //float scale = Mathf.Max(forprofitcalculation.transform.lossyScale.x, forprofitcalculation.transform.lossyScale.y);
+
+            //float radius = colliderforpiece.radius * scale;
+
+
+ 
 
             foreach (Collider2D hit in hits)
             {
@@ -426,28 +454,54 @@ public class PieceManager : MonoBehaviour
 
                 if (hit.gameObject.CompareTag("Piece"))
                 {
-                    if(piece.colornum != hit.gameObject.GetComponent<Piece>().colornum)
+                    Piece hitpiece = hit.gameObject.GetComponent<Piece>();  
+                    if(piece.colornum != hitpiece.colornum)
                     {
-                        if(formustcut == false)
+                        if(optionscript.showstar)
+                        if(!hitpiece.forshowstar(true, hitpiece.CurrentPosition) && !hitpiece.forshowstar(false, hitpiece.CurrentPosition))
                         {
-                            Piece.selectedpiece = piece.gameObject;
-                            Debug.Log("AI Cuttable found!!!!!!!!!!!!!!!!!!!!!!!!!");
-                            return;
+                            if(formustcut == false)
+                            {
+                                Piece.selectedpiece = piece.gameObject;
+                                Debug.Log("AI Cuttable found!!!!!!!!!!!!!!!!!!!!!!!!!");
+                                return;
+
+                            }
+
+                            else
+                            {
+                                Debug.Log("Cuttable found!!!!!!!!!!!!!!!!!!!!!!!!!");
+                                formustcutgameobject = piece.gameObject;
+                                formustcutlist.Add(piece.gameObject);
+                            }
 
                         }
-
                         else
                         {
-                            Debug.Log("Cuttable found!!!!!!!!!!!!!!!!!!!!!!!!!");
-                            formustcutgameobject = piece.gameObject;
-                            formustcutlist.Add(piece.gameObject);
+                            if(!hitpiece.forshowstar(true, hitpiece.CurrentPosition))
+                            {
+                                    if (formustcut == false)
+                                    {
+                                        Piece.selectedpiece = piece.gameObject;
+                                        Debug.Log("AI Cuttable found!!!!!!!!!!!!!!!!!!!!!!!!!");
+                                        return;
+
+                                    }
+
+                                    else
+                                    {
+                                        Debug.Log("Cuttable found!!!!!!!!!!!!!!!!!!!!!!!!!");
+                                        formustcutgameobject = piece.gameObject;
+                                        formustcutlist.Add(piece.gameObject);
+                                    }
+                                }
                         }
 
                     }
                 }
                 // You can add any additional logic for handling the collision.
             }
-            forprofitcalculation.SetActive(false);  
+            //forprofitcalculation.SetActive(false);  
         }
 
         if(formustcut == false)
@@ -472,7 +526,7 @@ public class PieceManager : MonoBehaviour
 
                     //boardPath.movetonewpos(forprofitcalculation, newposition, col);
                 }
-                }
+             }
 
 
         }
@@ -616,30 +670,34 @@ public class PieceManager : MonoBehaviour
             }
             Debug.Log("Selected");
 
-            if (optionscript.mustcuttable)
+            if(coinoutboolenable == false)
             {
-                bool checkequal = false;
-                profitcalculcation(true);
-                //if (formustcutgameobject != null)
-                if (formustcutlist.Count > 0)
+                if (optionscript.mustcuttable)
                 {
-                    //Piece.selectedpiece = formustcutgameobject;
-                    Debug.Log("selectedupdate3");
-                    foreach (GameObject gm in formustcutlist)
+                    bool checkequal = false;
+                    profitcalculcation(true);
+                    //if (formustcutgameobject != null)
+                    if (formustcutlist.Count > 0)
                     {
-                        if (Piece.selectedpiece == gm)
+                        //Piece.selectedpiece = formustcutgameobject;
+                        Debug.Log("selectedupdate3");
+                        foreach (GameObject gm in formustcutlist)
                         {
-                            Debug.Log("selectedupdate4");
-                            checkequal = true;
+                            if (Piece.selectedpiece == gm)
+                            {
+                                Debug.Log("selectedupdate4");
+                                checkequal = true;
+                            }
                         }
-                    }
-                    if (checkequal == false)
-                    {
-                        StartCoroutine(punishment(ps));
-                        Piece.alreadyselected = false;
-                        Piece.selectedpiece = null;
-                        selectedpiecemove = false;
-                        return;
+                        if (checkequal == false)
+                        {
+                            StartCoroutine(punishment(ps));
+                            Piece.alreadyselected = false;
+                            Piece.selectedpiece = null;
+                            selectedpiecemove = false;
+                            selectablebool = false;
+                            return;
+                        }
                     }
                 }
             }
@@ -652,7 +710,7 @@ public class PieceManager : MonoBehaviour
                 if (ps.IsInBase == true)
                 {
                     if (dicenum == oneorsix || (optionscript.sixalsobringcoinout && dicenum == 6) || (optionscript.onealsobringcoinout && dicenum == 1)
-                        || (optionscript.threesixstart && diceSystem.seconddicecounter == 3) || (optionscript.threeonestart && diceSystem.seconddicecounter == 3))
+                        || (optionscript.threesixstart && diceSystem.seconddice3times) || (optionscript.threeonestart && diceSystem.seconddice3times))
                     //if (dicenum == oneorsix)
                     {
                         StartCoroutine(MovePiece(ps));
@@ -693,6 +751,7 @@ public class PieceManager : MonoBehaviour
             AIenable = true;
 
             selectablebool = false;
+            coinoutboolenable = false;
         }
     }
     private void Update()
@@ -791,7 +850,8 @@ public class PieceManager : MonoBehaviour
             {
                 if (piece.IsInBase)
                 {
-                    if(optionscript.onealsobringcoinout && diceValue == 1|| optionscript.sixalsobringcoinout && diceValue == 6)
+                    if((optionscript.onealsobringcoinout && diceValue == 1)|| (optionscript.sixalsobringcoinout && diceValue == 6)
+                        || (optionscript.threeonestart && diceSystem.seconddice3times) || (optionscript.threesixstart && diceSystem.seconddice3times))
                     {
                         movable.Add(piece);
                     }
@@ -952,8 +1012,12 @@ public class PieceManager : MonoBehaviour
         {
             if (piece.IsInBase)
             {
-                if(currentDiceValue == oneorsix || (optionscript.sixalsobringcoinout && currentDiceValue == 6) || (optionscript.onealsobringcoinout && currentDiceValue == 1))
+                if(currentDiceValue == oneorsix || (optionscript.sixalsobringcoinout && currentDiceValue == 6) 
+                || (optionscript.onealsobringcoinout && currentDiceValue == 1) || (optionscript.threeonestart && diceSystem.seconddice3times) 
+                || (optionscript.threesixstart && diceSystem.seconddice3times))
                 {
+                    diceSystem.seconddice3times = false;
+                    //LudoDice2D.threeconsecappear = true;
                     piece.ismoving = true;
                     piece.lastposition = piece.CurrentPosition;
                     piece.ExitBase();
@@ -1033,7 +1097,9 @@ public class PieceManager : MonoBehaviour
         diceSystem.EnableDiceInteraction();
         dicecollider.enabled = true;
         diceSystem.changedicecoloronturn(currentDiceValue);
-
+        diceSystem.collisiontruepiece = false;
+        //diceSystem.collisioncheckbool = false;
+        diceSystem.SetTransparency(1f);
         diceSystem.piecemanagercodecomplete = true;
 
 
