@@ -560,10 +560,10 @@ public class Piece : MonoBehaviour
         }
 
     }
-    public void ToggleHighlight(bool state)
-    {
-        highlightEffect.SetActive(state);
-    }
+    //public void ToggleHighlight(bool state)
+    //{
+    //    highlightEffect.SetActive(state);
+    //}
 
     public void EnableSelection()
     {

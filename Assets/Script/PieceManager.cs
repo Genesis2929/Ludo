@@ -54,8 +54,34 @@ public class PieceManager : MonoBehaviour
 
     public static int rednum, greennum, bluenum , yellownum;
     public int secondoneorsix;
+
+    void movingspeed()
+    {
+        moveDuration = 0.2f;
+        if(PlayerPrefs.HasKey("SliderValue"))
+        {
+            float svalue = PlayerPrefs.GetFloat("SliderValue");
+            moveDuration = 0.2f - svalue/10;
+        }
+    }
+
+    void checkallinbase()
+    {
+        foreach(Piece mpiece in movablePieces)
+        {
+            if(!mpiece.IsInBase)
+            {
+                return;
+            }
+        }
+        Piece.selectedpiece = movablePieces[Random.Range(0, movablePieces.Count)].gameObject;
+        Debug.Log(Piece.selectedpiece.name);
+        Piece.alreadyselected = true;
+
+    }
     private void Start()
-    { 
+    {
+        movingspeed();
         rednum = 0; greennum = 0; bluenum = 0; yellownum = 0;
         if(greenpiece != null)
         {
@@ -211,6 +237,26 @@ public class PieceManager : MonoBehaviour
         }
     }
 
+    void foranim(int pindex)
+    {
+        if(pindex ==0 )
+        {
+            pieceanim(true, player1Pieces);
+        }
+        else if(pindex ==1 )
+        {
+            pieceanim(true, player2Pieces);
+        }
+        else if(pindex ==2 )
+        {
+            pieceanim(true, player3Pieces);
+        }
+        else
+        {
+            pieceanim(true, player4Pieces);
+        }
+    }
+
     public List<Piece> tocheckmovable = new List<Piece>();
     bool coinoutboolenable = false;
     void handlingpiece(int playerIndex, int diceValue)
@@ -265,10 +311,8 @@ public class PieceManager : MonoBehaviour
             //EnablePieceSelection(movablePieces);
             AIenable=false;
             diceSystem.collisioncheckbool = true;
-            //if(diceSystem.collisiontruepiece == true)
-            //{
-            //    diceSystem.SetTransparency(0.55f);
-            //}
+
+            foranim(playerIndex);
             dicecollider.enabled = false;
             selectedpiecemove = true;
             colorchoose = playerIndex;
@@ -281,25 +325,15 @@ public class PieceManager : MonoBehaviour
             {
                 if (mustbringoutcheck(movablePieces))
                 {
-                    //if (!ps.IsInBase)
-                    {
-                        //punishment(ps);
-                        //StartCoroutine(punishment(ps));
-                        //Piece.alreadyselected = false;
-                        //Piece.selectedpiece = null;
-                        //selectedpiecemove = false;
                         if (piecegm.gameObject != null)
                         {
                             Piece.selectedpiece = piecegm.gameObject;
                             Piece.alreadyselected = true;
                             coinoutboolenable = true;
                         }
-
-                        //ps = Piece.selectedpiece.GetComponent<Piece>();
-                    }
                 }
             }
-
+            checkallinbase();
             //if (optionscript.continueroll)
             //{
             //    continuerollon(diceValue);
@@ -572,6 +606,24 @@ public class PieceManager : MonoBehaviour
 
         }
     }
+
+    void pieceanim(bool animenable, List<Piece> playerpieceslist)
+    {
+        foreach(Piece playerps in playerpieceslist)
+        {
+            GameObject childgm = playerps.transform.GetChild(0).gameObject;
+
+            Animator anim = childgm.GetComponent<Animator>();
+            if (animenable)
+            {
+                anim.SetBool("PANIM", true);
+            }
+            else
+            {
+                anim.SetBool("PANIM", false);
+            }
+        }
+    }
     public void notouchinputforotherpiece(int whoseturn)
     {
         if(whoseturn == 0)
@@ -580,6 +632,8 @@ public class PieceManager : MonoBehaviour
             SetLayerForPieces(player3Pieces, "Ignore Raycast");
             SetLayerForPieces(player4Pieces, "Ignore Raycast");
             SetLayerForPieces(player1Pieces, "Default");
+
+
         }
         else if(whoseturn == 1)
         {
@@ -587,6 +641,8 @@ public class PieceManager : MonoBehaviour
             SetLayerForPieces(player3Pieces, "Ignore Raycast");
             SetLayerForPieces(player4Pieces, "Ignore Raycast");
             SetLayerForPieces(player2Pieces, "Default");
+
+
         }
         else if (whoseturn == 2)
         {
@@ -594,6 +650,9 @@ public class PieceManager : MonoBehaviour
             SetLayerForPieces(player1Pieces, "Ignore Raycast");
             SetLayerForPieces(player4Pieces, "Ignore Raycast");
             SetLayerForPieces(player3Pieces, "Default");
+
+
+ 
         }
         else if(whoseturn == 3)
         {
@@ -601,6 +660,8 @@ public class PieceManager : MonoBehaviour
             SetLayerForPieces(player3Pieces, "Ignore Raycast");
             SetLayerForPieces(player1Pieces, "Ignore Raycast");
             SetLayerForPieces(player4Pieces, "Default");
+
+
         }
     }
 
@@ -832,14 +893,6 @@ public class PieceManager : MonoBehaviour
 
         foreach (Piece piece in pieces)
         {
-            //if(piece.ispressedbyotherpiece)
-            //{
-            //    if(diceValue == oneorsix)
-            //    {
-            //        movable.Add(piece);
-            //    }
-            //}
-            //else
 
             if(piece.barrieron)
             {
@@ -885,38 +938,6 @@ public class PieceManager : MonoBehaviour
         return movable;
     }
 
-    void EnablePieceSelection(List<Piece> selectablePieces)
-    {
-        isWaitingForSelection = true;
-        selectionPrompt.SetActive(true);
-
-        // Highlight movable pieces
-        foreach (Piece piece in selectablePieces)
-        {
-            piece.ToggleHighlight(true);
-            piece.EnableSelection();
-        }
-    }
-
-    void DisablePieceSelection()
-    {
-        isWaitingForSelection = false;
-        selectionPrompt.SetActive(false);
-
-        foreach (Piece piece in movablePieces)
-        {
-            piece.ToggleHighlight(false);
-            piece.DisableSelection();
-        }
-    }
-
-    public void OnPieceSelected(Piece selectedPiece)
-    {
-        if (!isWaitingForSelection || !movablePieces.Contains(selectedPiece)) return;
-
-        DisablePieceSelection();
-        StartCoroutine(MovePiece(selectedPiece));
-    }
 
     public bool checkingentertohome(Piece ps)
     {
@@ -974,9 +995,12 @@ public class PieceManager : MonoBehaviour
     }
     IEnumerator MovePiece(Piece piece)
     {
+        pieceanim(false, player2Pieces);
+        pieceanim(false, player3Pieces);
+        pieceanim(false, player1Pieces);
+        pieceanim(false, player4Pieces);
 
-       
-        if(lastmovepiece != null)
+        if (lastmovepiece != null)
         {
             lastmovepiece.lastposition = lastmovepiece.CurrentPosition;
             lastmovepiece.wasjustmoving = false;
@@ -1101,6 +1125,7 @@ public class PieceManager : MonoBehaviour
                 diceSystem.EnableDiceInteraction();
             }
         }
+
         diceSystem.EnableDiceInteraction();
         dicecollider.enabled = true;
         diceSystem.changedicecoloronturn(currentDiceValue);
@@ -1112,11 +1137,11 @@ public class PieceManager : MonoBehaviour
 
     }
     // Called when player clicks a piece
-    public void PieceClicked(Piece clickedPiece)
-    {
-        if (isWaitingForSelection)
-        {
-            OnPieceSelected(clickedPiece);
-        }
-    }
+    //public void PieceClicked(Piece clickedPiece)
+    //{
+    //    if (isWaitingForSelection)
+    //    {
+    //        OnPieceSelected(clickedPiece);
+    //    }
+    //}
 }

@@ -202,19 +202,19 @@ public class BoardPath : MonoBehaviour
             }
             if (piece.colornum == 0)
             {
-                yield return MoveToWaypoint(piece.transform, greenwaypoints[newcheck].position, duration / (endPos - startPos));
+                yield return MoveToWaypoint(piece.transform, greenwaypoints[newcheck].position, duration);
             }
             else if(piece.colornum == 1)
             {
-                yield return MoveToWaypoint(piece.transform, yellowwaypoints[newcheck].position, duration / (endPos - startPos));
+                yield return MoveToWaypoint(piece.transform, yellowwaypoints[newcheck].position, duration);
             }
             else if(piece.colornum == 2)
             {
-                yield return MoveToWaypoint(piece.transform, bluewaypoints[newcheck].position, duration / (endPos - startPos));
+                yield return MoveToWaypoint(piece.transform, bluewaypoints[newcheck].position, duration);
             }
             else
             {
-                 yield return MoveToWaypoint(piece.transform, redwaypoints[newcheck].position, duration / (endPos - startPos));
+                 yield return MoveToWaypoint(piece.transform, redwaypoints[newcheck].position, duration);
 
             }
         }
@@ -222,6 +222,7 @@ public class BoardPath : MonoBehaviour
 
     public IEnumerator MovePieceToStart(Piece piece, float duration)
     {
+        duration = duration * 3f;
         if (piece.colornum == 0)
         {
             yield return MoveToWaypoint(piece.transform, greenwaypoints[0].position, duration);
