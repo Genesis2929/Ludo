@@ -19,6 +19,10 @@ public class PieceManager : MonoBehaviour
     [SerializeField] private List<Piece> player3Pieces;
     [SerializeField] private List<Piece> player4Pieces;
 
+    public static List<Piece> p1piece;
+    public static List<Piece> p2piece;
+    public static List<Piece> p3piece;
+    public static List<Piece> p4piece;
     [Header("Selection UI")]
     [SerializeField] private GameObject selectionPrompt;
     [SerializeField] private float moveDuration = 0.5f;
@@ -131,13 +135,16 @@ public class PieceManager : MonoBehaviour
             oneorsix = 1;
             secondoneorsix = 6;
         }
+
+
+        p1piece = player1Pieces;
+        p2piece = player2Pieces;
+        p3piece = player3Pieces;
+        p4piece = player4Pieces;    
     }
 
 
-    void coinnummatch()
-    {
-        
-    }
+
     //void dictioinaryshow()
     //{
     //    foreach(GameObject gm in Piece.samePosDictionary[Piece.Currentposit])

@@ -53,18 +53,62 @@ public class Piece : MonoBehaviour
     {
         if(colornum == 0)
         {
+            if(greenhavecut == false)
+            {
+                foreach(Piece psss in PieceManager.p1piece)
+                {
+                    if(psss.CurrentPosition == 51)
+                    {
+                        psss.CurrentPosition = -1;
+                    }
+
+                }
+            }
             greenhavecut = true;
         }
         else if(colornum == 1)
         {
+            if (yellowhavecut == false)
+            {
+                foreach (Piece psss in PieceManager.p2piece)
+                {
+                    if (psss.CurrentPosition == 51)
+                    {
+                        psss.CurrentPosition = -1;
+                    }
+
+                }
+            }
             yellowhavecut = true;
         }
         else if(colornum == 2)
         {
+            if (bluehavecut == false)
+            {
+                foreach (Piece psss in PieceManager.p3piece)
+                {
+                    if (psss.CurrentPosition == 51)
+                    {
+                        psss.CurrentPosition = -1;
+                    }
+
+                }
+            }
             bluehavecut = true;
         }
         else
         {
+            if (redhavecut == false)
+            {
+                foreach (Piece psss in PieceManager.p4piece)
+                {
+                    if (psss.CurrentPosition == 51)
+                    {
+                        psss.CurrentPosition = -1;
+                    }
+
+                }
+            }
             redhavecut = true;  
         }
     }
@@ -599,11 +643,7 @@ public class Piece : MonoBehaviour
         }
     }
 
-    //public void samepositionmaintainlist(int pieceposnumber, GameObject psobject)
-    //{
-    //    sameposlist.Add(gameObject);
-    //    sameposlist.Add(psobject);
-    //}
+
     public void movesortorder(GameObject gm, GameObject gm1, bool swap, bool add)
     {
 
@@ -652,102 +692,11 @@ public class Piece : MonoBehaviour
     }
 
 
-    //private void OnTriggerExit2D(Collider2D other)
-    //{
-    //    if(other.gameObject.CompareTag("Piece"))
-    //    {
-    //        if(other.gameObject.GetComponent<Piece>().colornum != colornum)
-    //             listmaintain();
-
-    //    }
-    //}
 
 
    public bool pendingListUpdate = false;
     public bool newpendingUpdate = false;
     public static bool endtriggeronetime = false;
-    //void OnTriggerExit2D(Collider2D collision)
-    //{
-    //    if(beforecurrrentposition != lastposition)
-    //    {
-    //        if(endtriggeronetime == false)
-    //        {
-    //            int newnum = currentposbasedoncolor(colornum, lastposition);
-    //            if (collision.gameObject.CompareTag("Piece"))
-    //            {
-    //                //if (collision.gameObject.GetComponent<Piece>().colornum != colornum)
-
-    //                Piece ps1 = collision.gameObject.GetComponent<Piece>();
-    //                int newnum1 = currentposbasedoncolor(ps1.colornum, ps1.CurrentPosition);
-    //                Debug.Log(CurrentPosition + "CurrPos:" + olddictionaryposition + ":dictpos"+beforecurrrentposition+":BeforeCurrentpos:"+newnum+":newnum:"+newnum1+"newnum1"+gameObject.name+":Name:"+ps1.CurrentPosition);
-
-    //                if(optionscript.showstar)
-    //                {
-    //                    if(forshowstar(true, ps1.CurrentPosition) || forshowstar(false, ps1.CurrentPosition))
-    //                    {
-    //                        if (forshowstar(true, CurrentPosition) || forshowstar(false, CurrentPosition))
-    //                        {
-
-    //                        Debug.Log("Inside");
-    //                        //if(CurrentPosition != lastposition)
-    //                        //pendingListUpdate = true;
-    //                        newpendingUpdate = true;
-
-    //                        }
-    //                    }
-
-    //                }
-    //                else
-    //                {
-    //                    if (forshowstar(true, ps1.CurrentPosition))
-    //                    {
-    //                        if (forshowstar(true, CurrentPosition))
-    //                        {
-
-    //                            Debug.Log("Inside");
-    //                            //if(CurrentPosition != lastposition)
-    //                            //pendingListUpdate = true;
-    //                            newpendingUpdate = true;
-
-    //                        }
-    //                    }
-    //                }
-    //            }
-
-                    
-                
-    //            endtriggeronetime = true;
-    //        }
-
-    //    }
-    //}
-
-    //void FixedUpdate()
-    //{
-    //    if(newpendingUpdate)
-    //    {
-    //        if(ismoving == false)
-    //        {
-    //            pendingListUpdate = true;
-    //        }
-    //    }
-    //    //listmaintain();
-    //    if (pendingListUpdate)
-    //    {
-    //        Debug.Log("InsideUpdate:"+CurrentPosition + "CurrPos:" + olddictionaryposition + ":dictpos:" + beforecurrrentposition + ":BeforeCurrentpos:");
-    //        if (beforecurrrentposition != olddictionaryposition)
-    //        {
-    //            if(ismoving==false)
-    //            {
-    //                listmaintain();
-    //                pendingListUpdate = false;
-    //                newpendingUpdate = false;
-
-    //            }
-
-    //        }
-    //    }
-    //}
 
     void forcollision(GameObject gm, Piece ps)
     {
