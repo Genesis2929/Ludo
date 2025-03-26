@@ -305,6 +305,53 @@ public class Piece : MonoBehaviour
         }
     }
 
+    public bool gamewin(int nummm)
+    {
+        if(colornum == 0)
+        {
+            if((greenhomenum + nummm) == optionscript.coinnumber)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else if(colornum == 1)
+        {
+            if ((yellowhomenum + nummm)== optionscript.coinnumber)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else if (colornum == 2)
+        {
+            if ((bluehomenum+nummm) == optionscript.coinnumber)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            if ((redhomenum + nummm)== optionscript.coinnumber)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
     private void Start()
     {
 
@@ -356,37 +403,37 @@ public class Piece : MonoBehaviour
         {
             greenhomenum++;
 
-            if(greenhomenum == optionscript.coinnumber)
-            {
-                
-            }
+            //if(greenhomenum == optionscript.coinnumber)
+            //{
+            //    PieceManager.onpiecehomecomplete(PieceManager.p1piece);
+            //}
         }
         if (colornum == 1)
         {
             yellowhomenum++;
 
-            if (yellowhomenum == optionscript.coinnumber)
-            {
-
-            }
+            //if (yellowhomenum == optionscript.coinnumber)
+            //{
+            //    PieceManager.onpiecehomecomplete(PieceManager.p2piece);
+            //}
         }
         if (colornum == 2)
         {
             bluehomenum++;
 
-            if (bluehomenum == optionscript.coinnumber)
-            {
-
-            }
+            //if (bluehomenum == optionscript.coinnumber)
+            //{
+            //    PieceManager.onpiecehomecomplete(PieceManager.p3piece);
+            //}
         }
         if (colornum == 3)
         {
             redhomenum++;
 
-            if (redhomenum == optionscript.coinnumber)
-            {
-
-            }
+            //if (redhomenum == optionscript.coinnumber)
+            //{
+            //    PieceManager.onpiecehomecomplete(PieceManager.p4piece);
+            //}
         }
     }
 
@@ -910,7 +957,6 @@ public class Piece : MonoBehaviour
                 }
                 else if (collision.gameObject.CompareTag("Home"))
                 {
-                    homereached();
                     if(optionscript.homegainturn)
                     {
                          homeorcutturn = true;
@@ -918,8 +964,16 @@ public class Piece : MonoBehaviour
                     }
                     if (homeorcutturn)
                     {
-                        dicesystem.homecutturning();
+                        if(gamewin(1))
+                        {
+                            homeorcutturn = false;
+                        }
+                        else
+                        {
+                            dicesystem.homecutturning();
+                        }
                     }
+                    homereached();
                 }
 
                 wasjustmoving = false;

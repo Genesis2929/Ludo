@@ -50,6 +50,7 @@ public class LudoDice2D : MonoBehaviour
     public static int playernum = 4, player1 = 0, player2 = 1, player3 = 2, player4 = 3;
     public  int playernumber = 4, playernumber1 = 0, playernumber2 = 1, playernumber3 = 2, playernumber4 = 3;
     public int AIplayernum = 0, AIplayernum1 = 0, AIplayernum2 = 1, AIplayernum3 = 2;
+    public static int AIstaticnum = 0, AIstaticnum1 = 0, AIstaticnum2 = 1, AIstaticnum3 = 2;
     public static int AIjustnumber = 0;
     public static int AInumber;
     [SerializeField] private float throwForceMultiplier = 50f;
@@ -132,7 +133,22 @@ public class LudoDice2D : MonoBehaviour
         AIjustnumber = AIplayernum1;
         //UpdateTurnDisplay();
     }
+    void playernumberupdating()
+    {
+        playernumber = playernum;
+        playernumber1 = player1;
+        playernumber2 = player2;
+        playernumber3 = player3;
+        playernumber4 = player4;
 
+        AIplayernum = AIstaticnum;
+        noofAI = AIstaticnum;
+        numberofAI = AIstaticnum;
+        AIplayernum1 = AIstaticnum1;
+        AIplayernum2 = AIstaticnum2;
+        AIplayernum3 = AIstaticnum3;
+
+    }
     public int secondoneorsix;
     private void Start()
     {
@@ -146,6 +162,11 @@ public class LudoDice2D : MonoBehaviour
             oneorsix = 1;
             secondoneorsix = 6;
         }
+
+        AIstaticnum = noofAI;
+        AIstaticnum1 = AIplayernum1;
+        AIstaticnum2 = AIplayernum2;
+        AIstaticnum3 = AIplayernum3;
     }
     void Playerpreferenceupdate()
     {
@@ -344,7 +365,7 @@ public class LudoDice2D : MonoBehaviour
             StartCoroutine(AIfunc(noofAI));
         }
     }
-    void AIsubfunc(int numberofai, bool forward)
+    public void AIsubfunc(int numberofai, bool forward)
     {
         Debug.Log("AIAGAIN:" + AIagain);
         //Debug.Log("AInumberchange");
@@ -437,7 +458,7 @@ public class LudoDice2D : MonoBehaviour
 
     }
 
-    bool turnchangecheck = false;
+    public bool turnchangecheck = false;
     int checkturningruncount = 0;
     int prevainum = 0;
     IEnumerator AIfunc(int numberofai)
@@ -493,6 +514,7 @@ public class LudoDice2D : MonoBehaviour
                         if (turnchangecheck == false)
                         {
                             //StartCoroutine(RollDice());
+                            PieceManager.isitreallyAI = true;
                             yield return StartCoroutine(RollDice());
                             checkturningruncount = 0;
                             //while (coroutinecompletes == false)
@@ -534,15 +556,15 @@ public class LudoDice2D : MonoBehaviour
 
                         //isAI = true;
                     }
-                    if (turnchangecheck)
-                    {
-                        turnchangecheck = false;
-                    }
-                    else
-                    {
+                    //if (turnchangecheck)
+                    //{
+                    //    turnchangecheck = false;
+                    //}
+                    //else
+                    //{
 
-                        AIsubfunc(numberofai, true);
-                    }
+                    //    AIsubfunc(numberofai, true);
+                    //}
 
                 }
                 else
@@ -659,6 +681,7 @@ public class LudoDice2D : MonoBehaviour
     int diffcurnum = -1;
     public void Update()
     {
+        playernumberupdating();
         //collisioncheckbool = false;
         //Debug.Log("Update"+touchrollbool);
         if (touchrollbool)
@@ -695,7 +718,7 @@ public class LudoDice2D : MonoBehaviour
         {
             if (collision.gameObject.CompareTag("Piece"))
             {
-                Debug.Log("Colision::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+                //Debug.Log("Colision::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
                 //SetTransparency(0.5f); // Reduce transparency (0.5 means 50% transparent)
                 collisiontruepiece = true;
             }
@@ -798,7 +821,7 @@ public class LudoDice2D : MonoBehaviour
             }
             Piece.homeorcutturn = false;
             Debug.Log("CURRENTPLAYER AND IT'S INDEX" + CurrentPlayer + ":" + currentPlayerIndex);
-            changedicecoloronturn(prevdicenumber);
+            //changedicecoloronturn(prevdicenumber);
         }
 
     }
@@ -810,113 +833,17 @@ public class LudoDice2D : MonoBehaviour
             if (threeoneorsix)
             {
                 dicecount++;
-                //currentPlayerIndex++;
-                //currentPlayerIndex = (currentPlayerIndex + 1) % 4;
+
                 if(optionscript.threeoneskip || optionscript.threesixskip)
                 {
                     turnchange(true);
+                    AIagain = false;
 
                 }
-                //turnchangecheck = true;
-                //if(aicalling)
-                //{
-                //    AIsubfunc(noofAI, true);
 
-                //}
-
-                //Debug.Log("CurrentPlayerIndex:" + currentPlayerIndex);
                 threeoneorsix = false;
             }
         }
-        //    else
-        //    {
-
-        //        if (Piece.homeorcutturn)
-        //        {
-        //            if (prevdicenumber == 2 || prevdicenumber == 3 || prevdicenumber == 4 || prevdicenumber == 5 || prevdicenumber == secondoneorsix)
-        //            {
-        //                if(optionscript.sixgiveanotherturn || optionscript.onealsogiveturn)
-        //                {
-        //                    if(prevdicenumber != secondoneorsix)
-        //                    {
-        //                        //currentPlayerIndex = (currentPlayerIndex - 1 + 4) % 4;
-        //                        turnchange(false);
-
-        //                        //Debug.Log("CurrentPlayerIndexafterturningchange:"+currentPlayerIndex+":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
-        //                        turnchangecheck = true;
-        //                    }
-        //                }
-        //                else
-        //                {
-        //                    turnchange(false);
-
-        //                    //Debug.Log("CurrentPlayerIndexafterturningchange:"+currentPlayerIndex+":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
-        //                    turnchangecheck = true;
-
-        //                }
-        //                //currentPlayerIndex = (currentPlayerIndex - 1 + 4) % 4;
-        //                //if (aicalling)
-        //                //AIsubfunc(noofAI, false);
-        //            }
-        //            else
-        //            {
-        //                AIturnenablefunc();
-        //            }
-        //            Piece.homeorcutturn = false;
-        //        }
-        //    }
-        //}
-        //else
-        //{
-        //    if (Piece.homeorcutturn)
-        //    {
-        //        if (prevdicenumber == 2 || prevdicenumber == 3 || prevdicenumber == 4 || prevdicenumber == 5 || prevdicenumber == secondoneorsix)
-        //        {
-        //            if (optionscript.sixgiveanotherturn || optionscript.onealsogiveturn)
-        //            {
-        //                if (prevdicenumber != secondoneorsix)
-        //                {
-        //                    //currentPlayerIndex = (currentPlayerIndex - 1 + 4) % 4;
-        //                    turnchange(false);
-
-        //                    //Debug.Log("CurrentPlayerIndexafterturningchange:"+currentPlayerIndex+":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
-        //                    turnchangecheck = true;
-        //                }
-        //            }
-        //            else
-        //            {
-        //                turnchange(false);
-
-        //                //Debug.Log("CurrentPlayerIndexafterturningchange:"+currentPlayerIndex+":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
-        //                turnchangecheck = true;
-
-        //            }
-        //            //currentPlayerIndex = (currentPlayerIndex - 1 + 4) % 4;
-        //            //if (aicalling)
-        //            //AIsubfunc(noofAI, false);
-        //        }
-        //        else
-        //        {
-        //            AIturnenablefunc();
-        //        }
-        //        Piece.homeorcutturn = false;
-        //    }
-        //    //else
-        //    //{
-        //    //    if (optionscript.other3timesskip)
-        //    //    {
-        //    //        if (seconddice3times)
-        //    //        {
-        //    //            dicecount++;
-        //    //            turnchange(true);
-        //    //            turnchangecheck = true;
-        //    //            seconddice3times = false;
-        //    //        }
-
-        //    //    }
-        //    //}
-        //}
-
 
     }
     void dicenumberchange()
@@ -1127,7 +1054,7 @@ public class LudoDice2D : MonoBehaviour
         OnDiceRollCompleted?.Invoke(currentPlayerIndex, finalValue);
         //tempdicevalue = finalValue;
         //tempplayerindex = currentPlayerIndex;
-        checkformovingturn(true);
+        //checkformovingturn(true);
     }
 
     public void AIturnenablefunc()
@@ -1138,7 +1065,7 @@ public class LudoDice2D : MonoBehaviour
             AIagain = true;
         }
     }
-    void checkformovingturn(bool checking2)
+    public void checkformovingturn(bool checking2)
     {
         //Debug.Log("Checkformovingturn");
         if ((oneorsix == 1 && optionscript.sixgiveanotherturn == true) || (oneorsix == 6 && optionscript.onealsogiveturn == true))
@@ -1320,5 +1247,7 @@ public class LudoDice2D : MonoBehaviour
                 }
             }
         }
+         Debug.Log("CurrentPlayerIndex:"+currentPlayerIndex+":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
     }
+
 }

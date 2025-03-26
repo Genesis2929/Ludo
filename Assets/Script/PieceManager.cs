@@ -54,6 +54,7 @@ public class PieceManager : MonoBehaviour
 
     public static int rednum, greennum, bluenum , yellownum;
     public int secondoneorsix;
+    bool forceturnchange = false;
 
     void movingspeed()
     {
@@ -175,6 +176,84 @@ public class PieceManager : MonoBehaviour
     //{
     //    foreach(GameObject gm in Piece.samePosDictionary[Piece.Currentposit])
     //}
+    static int firstranked = 1000;
+    static int secondranked = 1000;
+    static int thirdranked = 1000;
+    static int fourthranked = 1000;
+
+
+    public GameObject gameoverUI;
+    public static void onpiecehomecomplete(List<Piece> homeps)
+    {
+        homefunc(homeps[0].colornum);
+        ainumcheck(homeps[0].colornum);
+
+        LudoDice2D.playernum--;
+        if (firstranked == 1000)
+        {
+            firstranked = homeps[0].colornum;
+   
+        }
+        else if(secondranked == 1000)
+        {
+            secondranked = homeps[0].colornum;
+
+        }
+        else if(thirdranked == 1000)
+        {
+            thirdranked = homeps[0].colornum;
+
+        }
+        else if(fourthranked == 1000)
+        {
+            fourthranked = homeps[0].colornum;
+  
+        }
+
+    }
+
+    //turn issue..................................................................................................
+    static void ainumcheck(int conum)
+    {
+        if(conum == LudoDice2D.AIstaticnum1)
+        {
+            LudoDice2D.AIstaticnum1 = LudoDice2D.AIstaticnum2;
+            LudoDice2D.AIstaticnum2 = LudoDice2D.AIstaticnum3;
+            LudoDice2D.AIstaticnum--;
+        }
+        else if(conum == LudoDice2D.AIstaticnum2)
+        {
+            //LudoDice2D.AIstaticnum1 = LudoDice2D.AIstaticnum2;
+            LudoDice2D.AIstaticnum2 = LudoDice2D.AIstaticnum3;
+            LudoDice2D.AIstaticnum--;
+        }
+        else if (conum == LudoDice2D.AIstaticnum3)
+        {
+            LudoDice2D.AIstaticnum--;
+        }
+    }
+    static void homefunc(int conum)
+    {
+        if(conum == LudoDice2D.player1)
+        {
+            LudoDice2D.player1 = LudoDice2D.player2;
+            LudoDice2D.player2 = LudoDice2D.player3;
+            LudoDice2D.player3 = LudoDice2D.player4;
+        }
+        else if (conum == LudoDice2D.player2)
+        {
+            //LudoDice2D.player1 = LudoDice2D.player2;
+            LudoDice2D.player2 = LudoDice2D.player3;
+            LudoDice2D.player3 = LudoDice2D.player4;
+        }
+        else if (conum == LudoDice2D.player3)
+        {
+            //LudoDice2D.player1 = LudoDice2D.player2;
+            //LudoDice2D.player2 = LudoDice2D.player3;
+            LudoDice2D.player3 = LudoDice2D.player4;
+        }
+    }
+
     void OnEnable()
     {
         LudoDice2D.OnDiceRollCompleted += HandleDiceResult;
@@ -195,8 +274,9 @@ public class PieceManager : MonoBehaviour
         lastmovepiece.CurrentPosition = -1;
         threeconsecutivecut = false;
 
-        diceSystem.checkingturnandskip();
-        StartCoroutine(delayfor5(1.5f));
+        //diceSystem.checkformovingturn(true);
+        //diceSystem.checkingturnandskip();
+        StartCoroutine(delayfor5(1.5f, 2));
 
     }
     void HandleDiceResult(int playerIndex, int diceValue)
@@ -222,7 +302,7 @@ public class PieceManager : MonoBehaviour
                 }
 
                 else
-                StartCoroutine(delayfor5(1.5f));
+                StartCoroutine(delayfor5(1.5f, 1));
                 //diceSystem.EndTurn();
             }
            else
@@ -237,25 +317,6 @@ public class PieceManager : MonoBehaviour
         }
     }
 
-    void foranim(int pindex)
-    {
-        if(pindex ==0 )
-        {
-            pieceanim(true, player1Pieces);
-        }
-        else if(pindex ==1 )
-        {
-            pieceanim(true, player2Pieces);
-        }
-        else if(pindex ==2 )
-        {
-            pieceanim(true, player3Pieces);
-        }
-        else
-        {
-            pieceanim(true, player4Pieces);
-        }
-    }
 
     public List<Piece> tocheckmovable = new List<Piece>();
     bool coinoutboolenable = false;
@@ -291,7 +352,7 @@ public class PieceManager : MonoBehaviour
                     break;
                 }
             }
-            StartCoroutine(delayfor5(1.5f));
+            StartCoroutine(delayfor5(1.5f, 1));
             Debug.Log("No move");
 
             AIenable = true;
@@ -312,7 +373,8 @@ public class PieceManager : MonoBehaviour
             AIenable=false;
             diceSystem.collisioncheckbool = true;
 
-            foranim(playerIndex);
+            //foranim(playerIndex);
+            pieceanim(true, movablePieces);
             dicecollider.enabled = false;
             selectedpiecemove = true;
             colorchoose = playerIndex;
@@ -334,32 +396,33 @@ public class PieceManager : MonoBehaviour
                 }
             }
             checkallinbase();
-            //if (optionscript.continueroll)
-            //{
-            //    continuerollon(diceValue);
+            if (optionscript.continueroll)
+            {
+                continuerollon(diceValue);
 
-            //    if (diceValue == 2 || diceValue == 3 || diceValue == 4 || diceValue == 5 || diceValue == secondoneorsix)
-            //    {
-            //        if (optionscript.sixgiveanotherturn || optionscript.onealsogiveturn)
-            //        {
-            //            if (diceValue != secondoneorsix)
-            //            {
-            //                rollingfinish = true;
-            //            }
-            //            else
-            //            {
-            //                rollingfinish = false;
-            //            }
-            //        }
-            //        else
-            //        {
-            //            rollingfinish = true;
-            //        }
-            //    }
-            //}
+                if (diceValue == 2 || diceValue == 3 || diceValue == 4 || diceValue == 5 || diceValue == secondoneorsix)
+                {
+                    if (optionscript.sixgiveanotherturn || optionscript.onealsogiveturn)
+                    {
+                        if (diceValue != secondoneorsix)
+                        {
+                            rollingfinish = true;
+                        }
+                        else
+                        {
+                            rollingfinish = false;
+                        }
+                    }
+                    else
+                    {
+                        rollingfinish = true;
+                    }
+                }
+            }
         }
     }
-    
+
+    public static bool isitreallyAI = false;
     public void AIpiecemove()
     {
         if (LudoDice2D.isAIturn)
@@ -403,6 +466,7 @@ public class PieceManager : MonoBehaviour
                         Piece.selectedpiece = formustcutlist[i];
                     }
                 }
+                //isitreallyAI = true;
                 AIroll = false;
                 LudoDice2D.isAIturn = false;
             }
@@ -414,7 +478,7 @@ public class PieceManager : MonoBehaviour
     void continuerollon(int dicevalue)
     {
         storedicevalue.Add(dicevalue);
-        StartCoroutine(delayfor5(1.5f));
+        StartCoroutine(delayfor5(1.5f, 1));
     }
     GameObject piecegm = null;
     bool mustbringoutcheck(List<Piece> outpiece)
@@ -686,7 +750,11 @@ public class PieceManager : MonoBehaviour
         selectedpiecemove = false;
 
         lastmovepiece = ps;
-        StartCoroutine(delayfor5(1.5f));
+        pieceanim(false, player2Pieces);
+        pieceanim(false, player3Pieces);
+        pieceanim(false, player1Pieces);
+        pieceanim(false, player4Pieces);
+        StartCoroutine(delayfor5(1.5f,1));
 
 
         //diceSystem.checkingturnandskip();
@@ -718,6 +786,12 @@ public class PieceManager : MonoBehaviour
         }
         if (Piece.alreadyselected)
         {
+            if(storedicevalue.Count > 0)
+            {
+                dicenum = storedicevalue[dicecontinuerollcount];
+                dicecontinuerollcount++;
+
+            }
             Debug.Log("selectedupdate");
             Piece ps = Piece.selectedpiece.GetComponent<Piece>();
 
@@ -822,22 +896,36 @@ public class PieceManager : MonoBehaviour
             coinoutboolenable = false;
         }
     }
+
+    int dicecontinuerollcount = 0;
     private void Update()
     {
-        //if((optionscript.continueroll))
-        //{
-        //    if(rollingfinish)
-        //    {
-        //        for (int i = 0; i < storedicevalue.Count; i++)
-        //        {
-        //            selectedpiecemove = true;
-        //            forupdate();
+        if ((optionscript.continueroll))
+        {
+            if (rollingfinish)
+            {
+                //for (int i = 0; i < storedicevalue.Count; i++)
+                if(dicecontinuerollcount < storedicevalue.Count)
+                {
+                    if(Piece.selectedpiece == null)
+                    {
+                        selectedpiecemove = true;
+                        Piece.alreadyselected = false;
+                        forupdate();
+                        Piece.selectedpiece = null;
 
-        //        }
+                    }
 
-        //    }
-        //}
-        //else
+                }
+                else
+                {
+                    storedicevalue.Clear();
+                    dicecontinuerollcount = 0;
+                }
+
+            }
+        }
+        else
         {
             forupdate();
         }
@@ -993,6 +1081,28 @@ public class PieceManager : MonoBehaviour
             return false;
         }
     }
+
+    void colnumupdate()
+    {
+        if(currentpiececolornum == 0)
+        {
+            onpiecehomecomplete(p1piece);
+        }
+        else if (currentpiececolornum == 1)
+        {
+            onpiecehomecomplete(p2piece);
+        }
+        else if (currentpiececolornum == 2)
+        {
+            onpiecehomecomplete(p3piece);
+        }
+        else if (currentpiececolornum == 3)
+        {
+            onpiecehomecomplete(p4piece);
+        }
+    }
+
+    int currentpiececolornum = 0;
     IEnumerator MovePiece(Piece piece)
     {
         pieceanim(false, player2Pieces);
@@ -1006,6 +1116,7 @@ public class PieceManager : MonoBehaviour
             lastmovepiece.wasjustmoving = false;
 
         }
+        currentpiececolornum = piece.colornum;
         piece.wasjustmoving = true;
         lastmovepiece = piece;
         piece.collidednum = 0;
@@ -1030,6 +1141,15 @@ public class PieceManager : MonoBehaviour
             //{
             //    targetPosition = targetPosition % 52;
             //}
+
+            if(checkingentertohome(piece) == false)
+            {
+                if(targetPosition == 56)
+                {
+                    forceturnchange = piece.gamewin(1);
+                }
+
+            }
 
             yield return boardPath.MovePieceAlongPath(piece, piece.CurrentPosition, targetPosition, moveDuration);
             piece.SetPosition(targetPosition);
@@ -1056,6 +1176,7 @@ public class PieceManager : MonoBehaviour
 
                     //bool ch = checkingentertohome();
 
+
                     yield return boardPath.MovePieceToStart(piece, moveDuration);
                     if (piece.CurrentPosition == 0)
                     {
@@ -1078,6 +1199,14 @@ public class PieceManager : MonoBehaviour
                 //    targetPosition = targetPosition % 52;
                 //}
                 //Debug.Log(piece.ismoving);
+                if (checkingentertohome(piece) == false)
+                {
+                    if (targetPosition == 56)
+                    {
+                        forceturnchange = piece.gamewin(1);
+                    }
+
+                }
                 // Regular movement
                 yield return boardPath.MovePieceAlongPath(piece, piece.CurrentPosition, targetPosition, moveDuration);
                 piece.SetPosition(targetPosition);
@@ -1091,14 +1220,70 @@ public class PieceManager : MonoBehaviour
 
         }
 
-        StartCoroutine(delayfor5(0.5f));
+        StartCoroutine(delayfor5(0.5f, 1));
         Piece.endtriggeronetime = false;
 
     }
 
-    IEnumerator delayfor5(float delayamount)
+    IEnumerator delayfor5(float delayamount, int fordifferentdelay)
     {
+        int prevcurpos = diceSystem.currentPlayerIndex;
+        int ainum = LudoDice2D.AIjustnumber;
         yield return new WaitForSeconds(delayamount);
+        diceSystem.checkformovingturn(true);
+        if(fordifferentdelay == 2)
+        {
+            diceSystem.checkingturnandskip();
+        }
+        if(isitreallyAI)
+        {
+            if (diceSystem.turnchangecheck)
+            {
+                diceSystem.turnchangecheck = false;
+            }
+            else
+            {
+
+                diceSystem.AIsubfunc(diceSystem.noofAI, true);
+            }
+ 
+        }
+
+        if(forceturnchange)
+        {
+            diceSystem.currentPlayerIndex = prevcurpos;
+            LudoDice2D.AIjustnumber = ainum;
+
+            //if (prevcurpos == diceSystem.currentPlayerIndex)
+            {
+                diceSystem.turnchange(true);
+                if (isitreallyAI)
+                {
+                    if (diceSystem.turnchangecheck)
+                    {
+                        diceSystem.turnchangecheck = false;
+                    }
+                    else
+                    {
+
+                        diceSystem.AIsubfunc(diceSystem.noofAI, true);
+                    }
+
+                }
+            }
+            colnumupdate();
+
+            if (LudoDice2D.playernum == 0)
+            {
+                if (gameoverUI != null)
+                {
+                    gameoverUI.SetActive(true);
+                }
+            }
+            forceturnchange = false;
+        }
+
+        isitreallyAI = false;
         if (oneorsix == 1)
         {
             // Check for special conditions (e.g., 6 gives another turn)

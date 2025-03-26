@@ -29,10 +29,14 @@ public class settings : MonoBehaviour
     void Start()
     {
         // Load the stored slider value (default to 1 if not found)
-        slider.value = PlayerPrefs.GetFloat(SliderPrefKey, 1f);
+        if(slider != null)
+        {
+            slider.value = PlayerPrefs.GetFloat(SliderPrefKey, 1f);
 
-        // Add listener to detect changes
-        slider.onValueChanged.AddListener(delegate { SaveSliderValue(); });
+            // Add listener to detect changes
+            slider.onValueChanged.AddListener(delegate { SaveSliderValue(); });
+
+        }
     }
 
     public void SaveSliderValue()

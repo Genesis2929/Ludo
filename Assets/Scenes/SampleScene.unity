@@ -3813,6 +3813,7 @@ MonoBehaviour:
   touchbool: 0
   coroutinecompletes: 0
   secondoneorsix: 0
+  turnchangecheck: 0
   touchrollbool: 0
   interval: 0.5
   collisiontruepiece: 0
@@ -12139,6 +12140,7 @@ MonoBehaviour:
   _flingEnable: 1
   _difficultyLevel: 1
   _coinNumber: 4
+  _continueroll: 0
   _start3TimesSkip: 0
   _other3TimesSkip: 0
   _start3TimesCut: 0
@@ -19885,7 +19887,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 437
+  m_SortingOrder: 6140
   m_TargetDisplay: 0
 --- !u!224 &840446849
 RectTransform:
@@ -31975,6 +31977,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   settinggameobject: {fileID: 840446845}
+  slider: {fileID: 0}
 --- !u!1 &1320712415
 GameObject:
   m_ObjectHideFlags: 0

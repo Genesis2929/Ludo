@@ -80,6 +80,7 @@ public class optionscript : MonoBehaviour
     public bool _flingEnable = true;
     public int _difficultyLevel = 1;
     public int _coinNumber = 4;
+    public bool _continueroll = false;
 
     [Header("Three Times Rules")]
     public bool _start3TimesSkip = false;
@@ -114,6 +115,7 @@ public class optionscript : MonoBehaviour
         _start3TimesSkip = start3timesskip;
         _other3TimesSkip = other3timesskip;
         _start3TimesCut = start3timescut;
+        _continueroll = continueroll;
     }
 
 
@@ -129,22 +131,7 @@ public class optionscript : MonoBehaviour
             {
                 start3timescut=false;
             }
-            //if(threeoneskip == true)
-            //{
-            //    start3timesskip = true;
-            //}
-            //else
-            //{
-            //    start3timesskip = false;
-            //}
-            //if(threesixskip == true)
-            //{
-            //    other3timesskip = true;
-            //}
-            //else
-            //{
-            //    other3timesskip = false;
-            //}
+
         }
         else if(startatoneorsix == true)
         {
@@ -156,24 +143,22 @@ public class optionscript : MonoBehaviour
             {
                 start3timescut = false;
             }
-            //if (threesixskip == true)
-            //{
-            //    start3timesskip = true;
-            //}
-            //else
-            //{
-            //    start3timesskip=false;
-            //}
-            //if(threeoneskip == true)
-            //{
-            //    other3timesskip = true;
-            //}
-            //else
-            //{
-            //    other3timesskip = false;
-            //}
+
         }
-        
+
+        if (PlayerPrefs.HasKey("Continueroll"))
+        {
+            if (PlayerPrefs.GetInt("Continueroll") == 1)
+            {
+                continueroll = true;
+            }
+            else
+            {
+                continueroll=false;
+            }
+        }
+
+
     }
 
     private void Awake()
