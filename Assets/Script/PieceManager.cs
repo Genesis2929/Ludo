@@ -276,7 +276,7 @@ public class PieceManager : MonoBehaviour
 
         //diceSystem.checkformovingturn(true);
         //diceSystem.checkingturnandskip();
-        StartCoroutine(delayfor5(1.5f, 2));
+        StartCoroutine(delayfor5(0.5f, 2));
 
     }
     void HandleDiceResult(int playerIndex, int diceValue)
@@ -352,7 +352,7 @@ public class PieceManager : MonoBehaviour
                     break;
                 }
             }
-            StartCoroutine(delayfor5(1.5f, 1));
+            StartCoroutine(delayfor5(0.5f, 1));
             Debug.Log("No move");
 
             AIenable = true;
@@ -396,29 +396,29 @@ public class PieceManager : MonoBehaviour
                 }
             }
             checkallinbase();
-            if (optionscript.continueroll)
-            {
-                continuerollon(diceValue);
+            //if (optionscript.continueroll)
+            //{
+            //    continuerollon(diceValue);
 
-                if (diceValue == 2 || diceValue == 3 || diceValue == 4 || diceValue == 5 || diceValue == secondoneorsix)
-                {
-                    if (optionscript.sixgiveanotherturn || optionscript.onealsogiveturn)
-                    {
-                        if (diceValue != secondoneorsix)
-                        {
-                            rollingfinish = true;
-                        }
-                        else
-                        {
-                            rollingfinish = false;
-                        }
-                    }
-                    else
-                    {
-                        rollingfinish = true;
-                    }
-                }
-            }
+            //    if (diceValue == 2 || diceValue == 3 || diceValue == 4 || diceValue == 5 || diceValue == secondoneorsix)
+            //    {
+            //        if (optionscript.sixgiveanotherturn || optionscript.onealsogiveturn)
+            //        {
+            //            if (diceValue != secondoneorsix)
+            //            {
+            //                rollingfinish = true;
+            //            }
+            //            else
+            //            {
+            //                rollingfinish = false;
+            //            }
+            //        }
+            //        else
+            //        {
+            //            rollingfinish = true;
+            //        }
+            //    }
+            //}
         }
     }
 
@@ -900,32 +900,32 @@ public class PieceManager : MonoBehaviour
     int dicecontinuerollcount = 0;
     private void Update()
     {
-        if ((optionscript.continueroll))
-        {
-            if (rollingfinish)
-            {
-                //for (int i = 0; i < storedicevalue.Count; i++)
-                if(dicecontinuerollcount < storedicevalue.Count)
-                {
-                    if(Piece.selectedpiece == null)
-                    {
-                        selectedpiecemove = true;
-                        Piece.alreadyselected = false;
-                        forupdate();
-                        Piece.selectedpiece = null;
+        //if ((optionscript.continueroll))
+        //{
+        //    if (rollingfinish)
+        //    {
+        //        //for (int i = 0; i < storedicevalue.Count; i++)
+        //        if(dicecontinuerollcount < storedicevalue.Count)
+        //        {
+        //            if(Piece.selectedpiece == null)
+        //            {
+        //                selectedpiecemove = true;
+        //                Piece.alreadyselected = false;
+        //                forupdate();
+        //                Piece.selectedpiece = null;
 
-                    }
+        //            }
 
-                }
-                else
-                {
-                    storedicevalue.Clear();
-                    dicecontinuerollcount = 0;
-                }
+        //        }
+        //        else
+        //        {
+        //            storedicevalue.Clear();
+        //            dicecontinuerollcount = 0;
+        //        }
 
-            }
-        }
-        else
+        //    }
+        //}
+        //else
         {
             forupdate();
         }
@@ -1225,17 +1225,21 @@ public class PieceManager : MonoBehaviour
 
     }
 
-    IEnumerator delayfor5(float delayamount, int fordifferentdelay)
+    void movablecheck()
     {
-        int prevcurpos = diceSystem.currentPlayerIndex;
-        int ainum = LudoDice2D.AIjustnumber;
-        yield return new WaitForSeconds(delayamount);
+        if(storedicevalue.Count > 0)
+        {
+
+        }
+    }
+    void turningupdate(int prevcurpos, int ainum, int fordifferentdelay)
+    {
         diceSystem.checkformovingturn(true);
-        if(fordifferentdelay == 2)
+        if (fordifferentdelay == 2)
         {
             diceSystem.checkingturnandskip();
         }
-        if(isitreallyAI)
+        if (isitreallyAI)
         {
             if (diceSystem.turnchangecheck)
             {
@@ -1246,10 +1250,10 @@ public class PieceManager : MonoBehaviour
 
                 diceSystem.AIsubfunc(diceSystem.noofAI, true);
             }
- 
+
         }
 
-        if(forceturnchange)
+        if (forceturnchange)
         {
             diceSystem.currentPlayerIndex = prevcurpos;
             LudoDice2D.AIjustnumber = ainum;
@@ -1283,6 +1287,33 @@ public class PieceManager : MonoBehaviour
             forceturnchange = false;
         }
 
+    }
+    IEnumerator delayfor5(float delayamount, int fordifferentdelay)
+    {
+        int prevcurpos = diceSystem.currentPlayerIndex;
+        int ainum = LudoDice2D.AIjustnumber;
+        yield return new WaitForSeconds(delayamount);
+
+        if(optionscript.continueroll)
+        {
+            diceSystem.continuerollcounter++;
+            diceSystem.continuerollbool = false;
+            LudoDice2D.isAIturn = false;
+             //if(dicecontinuerollcount == storedicevalue.Count)
+            if(diceSystem.continuerollcounter == diceSystem.dicevaluestore.Count)
+            {
+                diceSystem.continuerollcounter = 0;
+                diceSystem.rollingfinish = false;
+                diceSystem.dicevaluestore.Clear();
+                turningupdate(prevcurpos, ainum, fordifferentdelay);
+                diceSystem.changedicecoloronturn(currentDiceValue);
+            }
+        }
+        else
+        {
+            turningupdate(prevcurpos, ainum, fordifferentdelay);
+            diceSystem.changedicecoloronturn(currentDiceValue);
+        }
         isitreallyAI = false;
         if (oneorsix == 1)
         {
@@ -1313,7 +1344,8 @@ public class PieceManager : MonoBehaviour
 
         diceSystem.EnableDiceInteraction();
         dicecollider.enabled = true;
-        diceSystem.changedicecoloronturn(currentDiceValue);
+        diceSystem.keeptouchingbool = false;
+
         diceSystem.collisiontruepiece = false;
         //diceSystem.collisioncheckbool = false;
         diceSystem.SetTransparency(1f);

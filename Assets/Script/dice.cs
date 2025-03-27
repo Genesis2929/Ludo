@@ -1,7 +1,9 @@
 using UnityEngine;
 //using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 using NUnit.Framework.Interfaces;
+using NUnit.Framework;
 
 public class LudoDice2D : MonoBehaviour
 {
@@ -515,27 +517,26 @@ public class LudoDice2D : MonoBehaviour
                         {
                             //StartCoroutine(RollDice());
                             PieceManager.isitreallyAI = true;
-                            yield return StartCoroutine(RollDice());
+                            if(optionscript.continueroll)
+                            {
+                                yield return StartCoroutine(continuerollon());
+                                //continuerollon();
+                            }
+                            else
+                            {
+                                yield return StartCoroutine(RollDice());
+                            }
                             checkturningruncount = 0;
-                            //while (coroutinecompletes == false)
-                            //{
-                            //    Debug.Log("wait for coroutine to  complete");
-                            //}
+
 
                         }
                         else
                         {
                             piecemanagercodecomplete = true;
                         }
-                        //else
-                        //{
-                        //    turnchangecheck = false;
-                        //    isAIturn = false;
-                        //}
-                        //Debug.Log("AI:" + currentPlayerIndex);
+
                         thiscodecomplete = true;
-                        //isAI = false;
-                        //AIjustnumber = currentPlayerIndex;
+
 
 
                     }
@@ -551,20 +552,8 @@ public class LudoDice2D : MonoBehaviour
                         isAIturn = false;
                         isAI = false;
                     }
-                    else
-                    {
 
-                        //isAI = true;
-                    }
-                    //if (turnchangecheck)
-                    //{
-                    //    turnchangecheck = false;
-                    //}
-                    //else
-                    //{
 
-                    //    AIsubfunc(numberofai, true);
-                    //}
 
                 }
                 else
@@ -577,101 +566,105 @@ public class LudoDice2D : MonoBehaviour
                 isAI= false;
 
             }
-            //else if(oneofai == false)
-            //{
-            //    thiscodecomplete= true;
-            //    piecemanagercodecomplete= true;
-            ////AIagain = true;
-            //}
+
             else
             {
-                //Debug.Log("A5");
-                //Debug.Log("Not equal");
-                //allowInteraction = false;
                 piecemanagercodecomplete=false; 
                 thiscodecomplete = false;
                 //yield return StartCoroutine(touchroll());
                 touchrollbool = true;
-                //touchbool = true;
 
-                //AIsubfunc(numberofai, true);
-                //oneofai = true;
-                //AIagain = true;
             }
 
         }
     }
     public bool touchrollbool = false;
+    public bool keeptouchingbool = false;
     IEnumerator touchroll()
     {
-        //Debug.Log("A5232332");
-        //Debug.Log("Inside touchroll");
-        if (Input.touchCount > 0)
+        if (keeptouchingbool == false)
         {
-            Touch touch = Input.GetTouch(0);
-            // Convert screen position to world position
-            Vector2 touchPosition = Camera.main.ScreenToWorldPoint(touch.position);
+            //Debug.Log("A5232332");
+            //Debug.Log("Inside touchroll");
+            if (Input.touchCount > 0)
+            {
+                Touch touch = Input.GetTouch(0);
+                // Convert screen position to world position
+                Vector2 touchPosition = Camera.main.ScreenToWorldPoint(touch.position);
 
-            if (touch.phase == TouchPhase.Began)
-            {
-                // Check if this dice is touched using a raycast
-                RaycastHit2D hit = Physics2D.Raycast(touchPosition, Vector2.zero);
-                if (hit.collider != null && hit.collider.CompareTag("Dice"))
+                if (touch.phase == TouchPhase.Began)
                 {
-                    isDragging = true;
-                    dragStartPos = touchPosition;
-                    lastTouchPos = touchPosition;
-                }
-            }
-            else if (touch.phase == TouchPhase.Moved)
-            {
-                if (isDragging)
-                {
-                    if (optionscript.flingenable)
+                    // Check if this dice is touched using a raycast
+                    RaycastHit2D hit = Physics2D.Raycast(touchPosition, Vector2.zero);
+                    if (hit.collider != null && hit.collider.CompareTag("Dice"))
                     {
-                        // Option 1: Use MovePosition to let physics move the dice while dragging
-                        rb.MovePosition(touchPosition);
-                        // Alternatively, you could use transform.position = touchPosition;
+                        isDragging = true;
+                        dragStartPos = touchPosition;
                         lastTouchPos = touchPosition;
-
                     }
                 }
-            }
-            else if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
-            {
-                if (isDragging)
+                else if (touch.phase == TouchPhase.Moved)
                 {
-
-                    if (optionscript.flingenable)
+                    if (isDragging)
                     {
-                        // Calculate the drag delta and then compute a throw force.
-                        Vector2 dragDelta = touchPosition - dragStartPos;
+                        if (optionscript.flingenable)
+                        {
+                            // Option 1: Use MovePosition to let physics move the dice while dragging
+                            rb.MovePosition(touchPosition);
+                            // Alternatively, you could use transform.position = touchPosition;
+                            lastTouchPos = touchPosition;
 
-                        // If you want to base the throw on the overall drag distance:
-                        Vector2 throwForce = dragDelta * dragForceMultiplier;
-
-                        // Or, if you prefer to use the last movement's direction:
-                        // Vector2 throwDirection = (touchPosition - lastTouchPos).normalized;
-                        // Vector2 throwForce = throwDirection * dragForceMultiplier;
-
-                        rb.AddForce(throwForce, ForceMode2D.Impulse);
-
+                        }
                     }
-
-                    if (!isRolling && allowInteraction)
+                }
+                else if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
+                {
+                    if (isDragging)
                     {
-                        dicenumberchange();
-                        dicecount++;
-                        //checkingturnandskip(false);
 
-                        yield return StartCoroutine(RollDice());
-                         touchrollbool = false;
-                        thiscodecomplete = true;
+                        if (optionscript.flingenable)
+                        {
+                            // Calculate the drag delta and then compute a throw force.
+                            Vector2 dragDelta = touchPosition - dragStartPos;
+
+                            // If you want to base the throw on the overall drag distance:
+                            Vector2 throwForce = dragDelta * dragForceMultiplier;
+
+                            // Or, if you prefer to use the last movement's direction:
+                            // Vector2 throwDirection = (touchPosition - lastTouchPos).normalized;
+                            // Vector2 throwForce = throwDirection * dragForceMultiplier;
+
+                            rb.AddForce(throwForce, ForceMode2D.Impulse);
+
+                        }
+
+                        if (!isRolling && allowInteraction)
+                        {
+                            keeptouchingbool = true;
+                            dicenumberchange();
+                            dicecount++;
+                            //checkingturnandskip(false);
+
+                            Debug.Log("Inside touchroll");
+                            if (optionscript.continueroll)
+                            {
+                                yield return StartCoroutine(continuerollon());
+                                //continuerollon();
+                            }
+                            else
+                            {
+                                yield return StartCoroutine(RollDice());
+                            }
+                            //yield return StartCoroutine(RollDice());
+                             touchrollbool = false;
+                            thiscodecomplete = true;
+                        }
+
+                        isDragging = false;
                     }
-
-                    isDragging = false;
                 }
             }
+
         }
     }
 
@@ -679,26 +672,68 @@ public class LudoDice2D : MonoBehaviour
     public float interval = 0.5f; // Seconds
 
     int diffcurnum = -1;
+    public int continuerollcounter = 0;
+    public bool continuerollbool = false;
     public void Update()
     {
         playernumberupdating();
         //collisioncheckbool = false;
         //Debug.Log("Update"+touchrollbool);
-        if (touchrollbool)
+
+        //if(optionscript.continueroll == false)
+        if(rollingfinish == false)
         {
-            StartCoroutine(touchroll());
-            //AIsubfunc(noofAI, true);
+            if (touchrollbool)
+            {
+                StartCoroutine(touchroll());
+                //AIsubfunc(noofAI, true);
+            }
+            if(diffcurnum != currentPlayerIndex)
+            {
+                threeoneorsix = false;
+                seconddice3times = false;
+                oneorsixcounter = 0;
+                seconddicecounter = 0;
+            }
+            diffcurnum = currentPlayerIndex;
+            numberofAI = noofAI;
+            AIrollfunc();
         }
-        if(diffcurnum != currentPlayerIndex)
+        //else
+        
+        else if(rollingfinish == true)
         {
-            threeoneorsix = false;
-            seconddice3times = false;
-            oneorsixcounter = 0;
-            seconddicecounter = 0;
+            if(continuerollcounter < dicevaluestore.Count)
+            {
+                if(continuerollbool == false)
+                {
+                    isAIturn = true;
+                    continuerollbool = true;
+                    finalValue = dicevaluestore[continuerollcounter];
+                    Debug.Log("FinalValue1:" + finalValue);
+                    //continuerollcounter++;
+                    StartCoroutine(RollDice());
+
+                }
+            }
+            //else if(dicevaluestore.Count == 0)
+            //{
+            //    Debug.Log("FinalValue:" + finalValue+ ":Continuerollcounter:"+continuerollcounter);
+
+            //    finalValue = dicevaluestore[continuerollcounter];
+            //    StartCoroutine(RollDice());
+            //    continuerollcounter = 0;
+            //    rollingfinish = false;
+            //}
+            else
+            {
+                Debug.Log("FinalValue2:" + finalValue);
+                //continuerollcounter = 0;
+                //rollingfinish = false;
+                //dicevaluestore.Clear();
+            }
         }
-        diffcurnum = currentPlayerIndex;
-        numberofAI = noofAI;
-        AIrollfunc();
+        
 
         //timer += Time.deltaTime;
 
@@ -711,23 +746,81 @@ public class LudoDice2D : MonoBehaviour
 
     }
 
+    public bool rollingfinish = false;
+    public bool thisfunccontinueonetime = false;
+    public List<int> dicevaluestore = new List<int>();
+    int dicefinal = 0;
+    IEnumerator continuerollon()
+    {
+        if(thisfunccontinueonetime == false)
+        {
+            thisfunccontinueonetime=true;
+            Debug.Log("Continueroll:::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+            yield return StartCoroutine(rollinganim());
+            if (currentPlayerIndex != probabilityplayer)
+                finalValue = Random.Range(1, 7);
+
+            else
+                finalValue = probDice();
+
+
+            rollanimend();
+
+            yield return new WaitForSeconds(1);
+            Debug.Log("22222222222Continueroll:::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+
+            keeptouchingbool = false;
+            dicefinal = finalValue;
+            continuerollbool = false;
+            continuerollcounter = 0;
+            if(finalValue == oneorsix)
+            {
+                Debug.Log("f1");
+                dicevaluestore.Add(finalValue);
+                thiscodecomplete = true;
+                piecemanagercodecomplete = true;
+                isAI = false;
+            }
+            else
+            {
+                if(optionscript.sixalsobringcoinout || optionscript.sixgiveanotherturn || optionscript.onealsobringcoinout || optionscript.onealsogiveturn)
+                {
+                    if(finalValue == secondoneorsix)
+                    {
+                        Debug.Log("f2");
+                        dicevaluestore.Add(finalValue);
+                        thiscodecomplete = true;
+                        piecemanagercodecomplete = true;
+                        isAI = false;
+                    }
+                    else
+                    {
+                        Debug.Log("f3");
+                        //yield return StartCoroutine(RollDice());
+                        dicevaluestore.Add(finalValue);
+                        rollingfinish = true;
+                    }
+                }
+                else
+                {
+                    Debug.Log("f4");
+                    //yield return StartCoroutine(RollDice());
+                    dicevaluestore.Add(finalValue);
+                    rollingfinish = true;
+                }
+            }
+            thisfunccontinueonetime = false;
+        }
+    }
     public bool collisiontruepiece = false;
     private void OnTriggerStay2D(Collider2D collision)
     {
-        //if(collisioncheckbool)
-        {
             if (collision.gameObject.CompareTag("Piece"))
             {
                 //Debug.Log("Colision::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
                 //SetTransparency(0.5f); // Reduce transparency (0.5 means 50% transparent)
                 collisiontruepiece = true;
             }
-
-        }
-        //else
-        //{
-        //    SetTransparency(1f);
-        //}
     }
 
     private void OnTriggerExit2D(Collider2D collision)
@@ -945,15 +1038,8 @@ public class LudoDice2D : MonoBehaviour
         }
     }
 
-    public bool collisioncheckbool = false;
-    IEnumerator RollDice()
+    IEnumerator rollinganim()
     {
-        isRolling = true;
-        allowInteraction = false;
-        finalValue = 0;
-        // float elapsedTime = 0f;
-
-        // Dice rolling animation
         float animInterval = rollDuration / rollAnimFrames;
         //collisioncheckbool = false;
         //Debug.Log("Currentplayer" + CurrentPlayer + "CurrentPlayerIndex:" + currentPlayerIndex);
@@ -983,31 +1069,13 @@ public class LudoDice2D : MonoBehaviour
             yield return new WaitForSeconds(animInterval);
         }
 
-        //collisioncheckbool = true;
-        if(collisiontruepiece == true)
-        {
-            SetTransparency(0.7f);
-        }
-        // Get final result
-        if (oneappeardice == false)
-        {
-            if (currentPlayerIndex != probabilityplayer)
-                finalValue = Random.Range(1, 7);
+    }
 
-            else
-                finalValue = probDice();
+    public bool collisioncheckbool = false;
 
-        }
-        else
-        {
-            finalValue = oneorsix;
-        }
-       //finalValue = 6;
-        //finalValue = 1; ///////////////////////////////////////////////////////////
-
-        consecutivecount();
-        //finalValue = 6;
-
+    void rollanimend()
+    {
+        Debug.Log("FinalValue inside rolldice:" + finalValue + ":DiceFinal:" + dicefinal);
         //diceRenderer.sprite = greendiceSprites[finalValue - 1];
         if (CurrentPlayer == 1)
         {
@@ -1025,6 +1093,60 @@ public class LudoDice2D : MonoBehaviour
         {
             diceRenderer.sprite = reddiceSprites[finalValue - 1];
         }
+    }
+    IEnumerator RollDice()
+    {
+        isRolling = true;
+        allowInteraction = false;
+
+        // float elapsedTime = 0f;
+
+        // Dice rolling animation
+        if(optionscript.continueroll == false)
+        {
+            yield return StartCoroutine(rollinganim());
+        }
+        else
+        {
+            yield return new WaitForSeconds(0);
+        }
+
+        //collisioncheckbool = true;
+        if(collisiontruepiece == true)
+        {
+            SetTransparency(0.7f);
+        }
+        // Get final result
+        if(optionscript.continueroll == false)
+        {
+            finalValue = 0;
+            if (oneappeardice == false)
+            {
+                if (currentPlayerIndex != probabilityplayer)
+                    finalValue = Random.Range(1, 7);
+
+                else
+                    finalValue = probDice();
+
+            }
+            else
+            {
+                finalValue = oneorsix;
+            }
+
+            rollanimend();
+        }
+        else
+        {
+            //finalValue = dicefinal;
+        }
+        //finalValue = 6;
+ 
+        //finalValue = 1; ///////////////////////////////////////////////////////////
+
+        consecutivecount();
+        //finalValue = 6;
+
 
         oneappeardice = false;
         // Handle turn logic
