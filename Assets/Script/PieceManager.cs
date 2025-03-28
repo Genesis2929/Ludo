@@ -80,6 +80,8 @@ public class PieceManager : MonoBehaviour
         Piece.alreadyselected = true;
 
     }
+
+    int totalplayer;
     private void Start()
     {
         movingspeed();
@@ -167,7 +169,9 @@ public class PieceManager : MonoBehaviour
         p1piece = player1Pieces;
         p2piece = player2Pieces;
         p3piece = player3Pieces;
-        p4piece = player4Pieces;    
+        p4piece = player4Pieces;
+
+        totalplayer = LudoDice2D.playernum;
     }
 
 
@@ -1277,16 +1281,93 @@ public class PieceManager : MonoBehaviour
             }
             colnumupdate();
 
-            if (LudoDice2D.playernum == 0)
+            if (LudoDice2D.playernum <= 1)
             {
                 if (gameoverUI != null)
                 {
-                    gameoverUI.SetActive(true);
+                    gameoverfunc();
+                    Time.timeScale = 0f;
                 }
             }
             forceturnchange = false;
         }
 
+    }
+
+    public TMP_Text text1, text2, text3, text4;
+    void gameoverfunc()
+    {
+        gameoverUI.SetActive(true);
+        if(firstranked == 0)
+        {
+            text1.text = "1 Green";
+        }
+        else if (firstranked == 1)
+        {
+            text1.text = "1 Yellow";
+        }
+        else if(firstranked == 2)
+        {
+            text1.text = "1 Blue";
+        }
+        else
+        {
+            text1.text = "1 Red";
+        }
+        if (secondranked == 0)
+        {
+            text2.text = "2 Green";
+        }
+        else if (secondranked == 1)
+        {
+            text2.text = "2 Yellow";
+        }
+        else if (secondranked == 2)
+        {
+            text2.text = "2 Blue";
+        }
+        else
+        {
+            text2.text = "2 Red";
+        }
+        if(thirdranked != 1000)
+        {
+            if (thirdranked == 0)
+            {
+                text3.text = "3 Green";
+            }
+            else if (thirdranked == 1)
+            {
+                text3.text = "3 Yellow";
+            }
+            else if (thirdranked == 2)
+            {
+                text3.text = "3 Blue";
+            }
+            else
+            {
+                text3.text = "3 Red";
+            }
+        }
+        if (fourthranked != 1000)
+        {
+            if (fourthranked == 0)
+            {
+                text4.text = "4 Green";
+            }
+            else if (fourthranked == 1)
+            {
+                text4.text = "4 Yellow";
+            }
+            else if (fourthranked == 2)
+            {
+                text4.text = "4 Blue";
+            }
+            else
+            {
+                text4.text = "4 Red";
+            }
+        }
     }
     IEnumerator delayfor5(float delayamount, int fordifferentdelay)
     {
