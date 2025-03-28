@@ -14,7 +14,13 @@ public class HomeOption : MonoBehaviour
     // Reference to your UI Text component.
     public TMP_Text displayText;
     int noofplayer, noofAI;
-    
+
+    void Awake()
+    {
+        QualitySettings.vSyncCount = 0;
+        Application.targetFrameRate = 60;
+
+    }
     public void exitbutton()
     {
         Application.Quit();
@@ -468,9 +474,25 @@ public class HomeOption : MonoBehaviour
         if (PlayerPrefs.HasKey("PlayerNumber"))
         {
             noofplayer = PlayerPrefs.GetInt("PlayerNumber");
-            if(noofplayer >= 2)
+            noofAI = PlayerPrefs.GetInt("AINumber");
+
+            if (noofplayer >= 2)
             {
-                 SceneManager.LoadScene(1);
+                if(noofAI < noofplayer)
+                {
+                    SceneManager.LoadScene(1);
+                }
+                else
+                {
+                    foreach (TMP_Text text in buttontext)
+                    {
+                        GameObject gm = text.gameObject;
+                        Animator anim = gm.GetComponent<Animator>();
+
+                        anim.SetTrigger("Textanim");
+
+                    }
+                }
             }
             else
             {
@@ -479,17 +501,7 @@ public class HomeOption : MonoBehaviour
                     GameObject gm = text.gameObject;
                     Animator anim = gm.GetComponent<Animator>();
 
-                    //if(anim != null)
-                    //{
-                    //    Debug.Log("chaiba");
-
-                    //}
-                    //Debug.Log(gm.transform.parent.name);
                     anim.SetTrigger("Textanim");
-                    //anim.SetBool("boolanime", true);
-                    //anim.SetBool("boolanime", false);
-
-
 
                 }
             }

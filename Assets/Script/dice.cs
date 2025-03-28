@@ -7,6 +7,7 @@ using NUnit.Framework;
 
 public class LudoDice2D : MonoBehaviour
 {
+    public soundscript soundplayobj;
     [Header("Dice Settings")]
     [SerializeField] private Sprite[] greendiceSprites; // 6 sprites for dice faces (1-6)
     [SerializeField] private Sprite[] greendiceAnim; // 6 sprites for dice faces (1-6)
@@ -95,8 +96,17 @@ public class LudoDice2D : MonoBehaviour
 
     public static int AIforPieceManagerNumber = 0;
     public bool coroutinecompletes = false;
+
+
+    void savingcurrentstate()
+    {
+
+    }
     void Awake()
     {
+        QualitySettings.vSyncCount = 0;
+        Application.targetFrameRate = 60;
+
         noofAI = 0;
         coroutinecompletes = false;
         touchbool = false;
@@ -169,6 +179,7 @@ public class LudoDice2D : MonoBehaviour
         AIstaticnum1 = AIplayernum1;
         AIstaticnum2 = AIplayernum2;
         AIstaticnum3 = AIplayernum3;
+        probabilityplayer = 10;
     }
     void Playerpreferenceupdate()
     {
@@ -1040,6 +1051,7 @@ public class LudoDice2D : MonoBehaviour
 
     IEnumerator rollinganim()
     {
+        soundplayobj.dicerollplay();
         float animInterval = rollDuration / rollAnimFrames;
         //collisioncheckbool = false;
         //Debug.Log("Currentplayer" + CurrentPlayer + "CurrentPlayerIndex:" + currentPlayerIndex);

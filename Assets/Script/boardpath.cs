@@ -18,6 +18,9 @@ public class BoardPath : MonoBehaviour
     [SerializeField] private Transform[] bluewaypoints;
     [SerializeField] private Transform[] redwaypoints;
 
+    public soundscript soundscriptobj;
+    
+
     private void Start()
     {
 
@@ -184,6 +187,7 @@ public class BoardPath : MonoBehaviour
         int newcheck = 0;
         for (int i = startPos + 1; i <= endPos; i++)
         {
+            soundscriptobj.piecemovesound();
             if(optionscript.mustcuttoenterhome)
             {
                 if (!piece.piecehavecut())
@@ -222,7 +226,8 @@ public class BoardPath : MonoBehaviour
 
     public IEnumerator MovePieceToStart(Piece piece, float duration)
     {
-        duration = duration * 3f;
+        soundscriptobj.piecemovesound();
+        duration = duration * 1.5f;
         if (piece.colornum == 0)
         {
             yield return MoveToWaypoint(piece.transform, greenwaypoints[0].position, duration);

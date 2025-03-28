@@ -5,6 +5,7 @@ using UnityEngine.TextCore.Text;
 using UnityEngine.UIElements;
 using TMPro;
 using System.Net.NetworkInformation;
+using UnityEngine.LowLevel;
 
 public class PieceManager : MonoBehaviour
 {
@@ -62,7 +63,7 @@ public class PieceManager : MonoBehaviour
         if(PlayerPrefs.HasKey("SliderValue"))
         {
             float svalue = PlayerPrefs.GetFloat("SliderValue");
-            moveDuration = 0.2f - svalue/10;
+            moveDuration = 0.25f - svalue/10;
         }
     }
 
@@ -172,9 +173,13 @@ public class PieceManager : MonoBehaviour
         p4piece = player4Pieces;
 
         totalplayer = LudoDice2D.playernum;
+        pl1 = LudoDice2D.player1;
+        pl2 = LudoDice2D.player2;
+        pl3 = LudoDice2D.player3;
+        pl4 = LudoDice2D.player4;
     }
 
-
+    int pl1, pl2, pl3, pl4;
 
     //void dictioinaryshow()
     //{
@@ -271,6 +276,10 @@ public class PieceManager : MonoBehaviour
 
     IEnumerator cutpiecefrom3oneorsix()
     {
+        if(lastmovepiece.barrieron)
+        {
+            lastmovepiece.barrierbreak(false, lastmovepiece);
+        }
         lastmovepiece.cutpiece(lastmovepiece.colornum, lastmovepiece.piecenumber, lastmovepiece.gameObject);
         lastmovepiece.IsInBase = true;
         yield return new WaitForSeconds(0.2f);
@@ -400,29 +409,6 @@ public class PieceManager : MonoBehaviour
                 }
             }
             checkallinbase();
-            //if (optionscript.continueroll)
-            //{
-            //    continuerollon(diceValue);
-
-            //    if (diceValue == 2 || diceValue == 3 || diceValue == 4 || diceValue == 5 || diceValue == secondoneorsix)
-            //    {
-            //        if (optionscript.sixgiveanotherturn || optionscript.onealsogiveturn)
-            //        {
-            //            if (diceValue != secondoneorsix)
-            //            {
-            //                rollingfinish = true;
-            //            }
-            //            else
-            //            {
-            //                rollingfinish = false;
-            //            }
-            //        }
-            //        else
-            //        {
-            //            rollingfinish = true;
-            //        }
-            //    }
-            //}
         }
     }
 
@@ -478,12 +464,7 @@ public class PieceManager : MonoBehaviour
     }
 
     List<int> storedicevalue = new List<int>();
-    bool rollingfinish = false;
-    void continuerollon(int dicevalue)
-    {
-        storedicevalue.Add(dicevalue);
-        StartCoroutine(delayfor5(1.5f, 1));
-    }
+
     GameObject piecegm = null;
     bool mustbringoutcheck(List<Piece> outpiece)
     {
@@ -957,13 +938,27 @@ public class PieceManager : MonoBehaviour
         {
             int pieceslistpos = pieceslist.currentposbasedoncolor(pieceslist.colornum, pieceslist.CurrentPosition);
 
-            if (actualpos <= pieceslistpos && tarpos >= pieceslistpos)
+            Debug.Log("ActualPos:" + actualpos + ":TargetPos:" + tarpos + ":PiecelistPos:" + pieceslistpos);
+            if(actualpos < tarpos)
             {
-                barrierbool = false;
+                if (actualpos <= pieceslistpos && tarpos >= pieceslistpos)
+                {
+                    barrierbool = false;
+                }
             }
-            else if(actualpos >= pieceslistpos && tarpos <= pieceslistpos)
+            else
             {
-                barrierbool = false;
+                if(tarpos > pieceslistpos)
+                {
+                    barrierbool = false;
+                }
+                else
+                {
+                    if(actualpos < pieceslistpos)
+                    {
+                        barrierbool = false;
+                    }
+                }
             }
 
         }
@@ -1229,13 +1224,6 @@ public class PieceManager : MonoBehaviour
 
     }
 
-    void movablecheck()
-    {
-        if(storedicevalue.Count > 0)
-        {
-
-        }
-    }
     void turningupdate(int prevcurpos, int ainum, int fordifferentdelay)
     {
         diceSystem.checkformovingturn(true);
@@ -1291,82 +1279,149 @@ public class PieceManager : MonoBehaviour
             }
             forceturnchange = false;
         }
+     
+    }
 
+    void lastranked()
+    {
+        List<int> playersls = new List<int>();
+        playersls.Add(pl1);
+        if (totalplayer >= 2)
+            playersls.Add(pl2);
+        if (totalplayer >= 3)
+            playersls.Add(pl3);
+        if (totalplayer == 4)
+            playersls.Add(pl4);
+
+        if (totalplayer == 2)
+        {
+            // For two players, choose the one that isn't already first.
+            foreach (int p in playersls)
+            {
+                if (p != firstranked)
+                {
+                    secondranked = p;
+                    break;
+                }
+            }
+        }
+        else if (totalplayer == 3)
+        {
+            // For three players, choose the one that's neither first nor second.
+            foreach (int p in playersls)
+            {
+                if (p != firstranked && p != secondranked)
+                {
+                    thirdranked = p;
+                    break;
+                }
+            }
+        }
+        else if (totalplayer == 4)
+        {
+            // For four players, choose the one that's not first, second, or third.
+            foreach (int p in playersls)
+            {
+                if (p != firstranked && p != secondranked && p != thirdranked)
+                {
+                    fourthranked = p;
+                    break;
+                }
+            }
+        }
     }
 
     public TMP_Text text1, text2, text3, text4;
+    public GameObject trophy3, trophy4, background3, background4;
     void gameoverfunc()
     {
+        lastranked();
         gameoverUI.SetActive(true);
         if(firstranked == 0)
         {
-            text1.text = "1 Green";
+            text1.text = " Green";
         }
         else if (firstranked == 1)
         {
-            text1.text = "1 Yellow";
+            text1.text = " Yellow";
         }
         else if(firstranked == 2)
         {
-            text1.text = "1 Blue";
+            text1.text = " Blue";
         }
         else
         {
-            text1.text = "1 Red";
+            text1.text = " Red";
         }
         if (secondranked == 0)
         {
-            text2.text = "2 Green";
+            text2.text = " Green";
         }
         else if (secondranked == 1)
         {
-            text2.text = "2 Yellow";
+            text2.text = " Yellow";
         }
         else if (secondranked == 2)
         {
-            text2.text = "2 Blue";
+            text2.text = " Blue";
         }
         else
         {
-            text2.text = "2 Red";
+            text2.text = " Red";
         }
         if(thirdranked != 1000)
         {
             if (thirdranked == 0)
             {
-                text3.text = "3 Green";
+                text3.text = " Green";
             }
             else if (thirdranked == 1)
             {
-                text3.text = "3 Yellow";
+                text3.text = " Yellow";
             }
             else if (thirdranked == 2)
             {
-                text3.text = "3 Blue";
+                text3.text = " Blue";
             }
             else
             {
-                text3.text = "3 Red";
+                text3.text = " Red";
             }
+        }
+        else
+        {
+            trophy3.SetActive(false);
+            GameObject gm = text3.gameObject.transform.parent.gameObject;
+            gm.SetActive(false);
+            background3.SetActive(false);
+            text3.text = " ";
         }
         if (fourthranked != 1000)
         {
             if (fourthranked == 0)
             {
-                text4.text = "4 Green";
+                text4.text = " Green";
             }
             else if (fourthranked == 1)
             {
-                text4.text = "4 Yellow";
+                text4.text = " Yellow";
             }
             else if (fourthranked == 2)
             {
-                text4.text = "4 Blue";
+                text4.text = " Blue";
             }
             else
             {
-                text4.text = "4 Red";
+                text4.text = " Red";
             }
+        }
+        else
+        {
+            trophy4.SetActive(false);
+            GameObject gm = text4.gameObject.transform.parent.gameObject;
+            gm.SetActive(false);
+            background4.SetActive(false);
+            text4.text = " ";
         }
     }
     IEnumerator delayfor5(float delayamount, int fordifferentdelay)

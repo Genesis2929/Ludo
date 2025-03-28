@@ -875,6 +875,9 @@ public class Piece : MonoBehaviour
                                     if (forshowstar(false, CurrentPosition) == true)
                                     {
                                         forcollision(collision.gameObject, ps);
+                                        collidednum++;
+                                        ps.collidednum++;
+                                        sidesit(ps);
                                     }
                                     else
                                     {

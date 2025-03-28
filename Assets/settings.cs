@@ -19,10 +19,15 @@ public class settings : MonoBehaviour
 
     public void backbutton()
     {
+        Time.timeScale = 1f;
         SceneManager.LoadScene(0);
 
     }
-
+    public void nextgame()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(1);
+    }
     public Slider slider; // Reference to the UI Slider
     private const string SliderPrefKey = "SliderValue"; // Key for PlayerPrefs
 
