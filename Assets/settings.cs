@@ -42,8 +42,24 @@ public class settings : MonoBehaviour
             slider.onValueChanged.AddListener(delegate { SaveSliderValue(); });
 
         }
-    }
 
+        //if (PlayerPrefs.HasKey("MusicVolume"))
+        //{
+        //    musicslider.value = PlayerPrefs.GetInt("MusicVolume");
+        //}
+        //if (PlayerPrefs.HasKey("MusicVolume"))
+        //{
+        //    musicslider.value = PlayerPrefs.GetInt("MusicVolume");
+        //    gameaudio.volume = musicslider.value;
+        //}
+        //if (PlayerPrefs.HasKey("AudioVolume"))
+        //{
+        //    audioslider.value = PlayerPrefs.GetInt("AudioVolume");
+        //    gameaudio.volume = audioslider.value;
+        //}
+    }
+    //public Slider audioslider, musicslider;
+    //public AudioSource bgaudio, gameaudio;
     public void SaveSliderValue()
     {
         PlayerPrefs.SetFloat(SliderPrefKey, slider.value);

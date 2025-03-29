@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using NUnit.Framework;
 
 public class BoardPath : MonoBehaviour
 {
@@ -19,21 +21,36 @@ public class BoardPath : MonoBehaviour
     [SerializeField] private Transform[] redwaypoints;
 
     public soundscript soundscriptobj;
-    
 
+    public List<GameObject> nocuthome = new List<GameObject>();
     private void Start()
     {
 
         if(optionscript.mustcuttoenterhome)
         {
             waypointadd(true, false, false, false, false);
+            nocuthomeenable();
         }
         else
         {
             waypointadd(false, true, true, true, true);
         }
     }
+    void nocuthomeenable()
+    {
+        for(int i = 0; i <4; i++)
+        {
+            if(LudoDice2D.player1 == i || LudoDice2D.player2 == i || LudoDice2D.player3 == i || LudoDice2D.player4 == i)
+            {
+                nocuthome[i].SetActive(true);
+            }
+            else
+            {
+                nocuthome[i].SetActive(false);
+            }
 
+        }
+    }
     private void Update()
     {
         if(Piece.greenhavecut)
@@ -66,13 +83,25 @@ public class BoardPath : MonoBehaviour
         else
         {
             if(green)
-            g1 = greenwaypointgameobject;
+            {
+                g1 = greenwaypointgameobject;
+                nocuthome[0].SetActive(false);
+            }
             if(yellow)
-            g2 = yellowwaypointgameobject;
+            {
+                nocuthome[1].SetActive(false);
+                g2 = yellowwaypointgameobject;
+            }
             if(red)
-            g3 = redwaypointgameobject;
+            {
+                g3 = redwaypointgameobject;
+                nocuthome[2].SetActive(false);
+            }
             if(blue)
-            g4 = bluewaypointgameobject;
+            {
+                g4 = bluewaypointgameobject;
+                nocuthome[3].SetActive(false);
+            }
         }
         if (g2 != null)
         {
@@ -222,6 +251,42 @@ public class BoardPath : MonoBehaviour
 
             }
         }
+    }
+
+    public IEnumerator movebacktohome(Piece piece,int startPos, int endPos, float duration)
+    {
+        Debug.Log("InsideIenumerator::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+        //duration = duration / 10;
+        soundscriptobj.piecemovediesound();
+        for (int i = startPos - 1; i >= endPos; i--)
+        {
+        Debug.Log("1InsideIenumerator::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+            piece.gameObject.GetComponent<CircleCollider2D>().enabled = false;
+            piece.transform.GetChild(0).GetComponent<CircleCollider2D>().enabled = false;
+
+            soundscriptobj.piecemovesound();
+            if (piece.colornum == 0)
+            {
+                yield return MoveToWaypoint(piece.transform, greenwaypoints[i].position, duration/startPos - endPos);
+            }
+            else if (piece.colornum == 1)
+            {
+                yield return MoveToWaypoint(piece.transform, yellowwaypoints[i].position, duration/startPos - endPos);
+            }
+            else if (piece.colornum == 2)
+            {
+                yield return MoveToWaypoint(piece.transform, bluewaypoints[i].position, duration / startPos - endPos);
+            }
+            else
+            {
+                yield return MoveToWaypoint(piece.transform, redwaypoints[i].position, duration/ startPos - endPos);
+
+            }
+        }
+        piece.cutpiece(piece.colornum, piece.piecenumber, piece.gameObject);
+        piece.gameObject.GetComponent<CircleCollider2D>().enabled = true;
+        piece.transform.GetChild(0).GetComponent<CircleCollider2D>().enabled = true;
+
     }
 
     public IEnumerator MovePieceToStart(Piece piece, float duration)

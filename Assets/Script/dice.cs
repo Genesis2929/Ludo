@@ -181,6 +181,7 @@ public class LudoDice2D : MonoBehaviour
         AIstaticnum3 = AIplayernum3;
         probabilityplayer = 10;
     }
+
     void Playerpreferenceupdate()
     {
 

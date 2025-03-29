@@ -280,7 +280,8 @@ public class PieceManager : MonoBehaviour
         {
             lastmovepiece.barrierbreak(false, lastmovepiece);
         }
-        lastmovepiece.cutpiece(lastmovepiece.colornum, lastmovepiece.piecenumber, lastmovepiece.gameObject);
+        StartCoroutine(boardPath.movebacktohome(lastmovepiece, lastmovepiece.CurrentPosition, 0, 0.1f));
+        //lastmovepiece.cutpiece(lastmovepiece.colornum, lastmovepiece.piecenumber, lastmovepiece.gameObject);
         lastmovepiece.IsInBase = true;
         yield return new WaitForSeconds(0.2f);
 
@@ -634,26 +635,27 @@ public class PieceManager : MonoBehaviour
         {
             curpos.Add(piece.CurrentPosition);
   
-            piece.gameObject.layer = layer;
-      
-        }
-
-        for(int i = 0; i < curpos.Count; i++)
-        {
-            for(int j = i + 1; j<curpos.Count; j++)
-            {
-                if (curpos[j] == curpos[i])
-                {
-                    //same number
-
-                    if(pieces[i].toppositionnumber < pieces[j].toppositionnumber)
-                    {
-                        pieces[j].gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
-                    }
-                }
-            }
+            piece.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+            piece.transform.GetChild(0).gameObject.layer = layer;
 
         }
+
+        //for(int i = 0; i < curpos.Count; i++)
+        //{
+        //    for(int j = i + 1; j<curpos.Count; j++)
+        //    {
+        //        if (curpos[j] == curpos[i])
+        //        {
+        //            //same number
+
+        //            if(pieces[i].toppositionnumber < pieces[j].toppositionnumber)
+        //            {
+        //                pieces[j].gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+        //            }
+        //        }
+        //    }
+
+        //}
     }
 
     void pieceanim(bool animenable, List<Piece> playerpieceslist)
@@ -724,7 +726,8 @@ public class PieceManager : MonoBehaviour
 
         }
         ps.beforecurrrentposition = -1;
-        ps.cutpiece(ps.colornum, ps.piecenumber, ps.gameObject);
+        //ps.cutpiece(ps.colornum, ps.piecenumber, ps.gameObject);
+        StartCoroutine(boardPath.movebacktohome(ps, ps.CurrentPosition, 0, 0.1f));
         ps.IsInBase = true;
         yield return new WaitForSeconds(0.2f);
 
@@ -758,10 +761,10 @@ public class PieceManager : MonoBehaviour
             RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
             if (hit.collider != null)
             {
-                if (hit.collider.CompareTag("Piece"))
+                if (hit.collider.CompareTag("Piecechild"))
                 {
                     Debug.Log("Clicked on: " + hit.collider.gameObject.name);
-                    Piece hitps = hit.collider.gameObject.GetComponent<Piece>();
+                    Piece hitps = hit.collider.transform.parent.gameObject.GetComponent<Piece>();
 
                     hitps.touchclick();
 

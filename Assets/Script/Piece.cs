@@ -375,6 +375,7 @@ public class Piece : MonoBehaviour
             if (colornum ==  LudoDice2D.player1 || colornum == LudoDice2D.player2 || colornum == LudoDice2D.player3)
             {
                 gameObject.SetActive(true);
+                
             }
             else
             {
@@ -834,6 +835,9 @@ public class Piece : MonoBehaviour
             gm.gameObject.transform.position = prepos + Mathf.Pow(jn, i+1) * new Vector3(0.02f, 0.02f, 0) *kn;
         }
     }
+
+
+    public BoardPath bpath;
     void OnTriggerStay2D(Collider2D collision)
     {
 
@@ -883,8 +887,9 @@ public class Piece : MonoBehaviour
                                     {
                                         if (colornum != ps.colornum)
                                         {
-                                            cutpiece(ps.colornum, ps.piecenumber, ps.gameObject);
-
+                                            //cutpiece(ps.colornum, ps.piecenumber, ps.gameObject);
+                                            Debug.Log("111111111111111111111111111111111111111111111111111111111111111");
+                                            StartCoroutine(bpath.movebacktohome(ps, ps.CurrentPosition, 0, 0.1f));
                                             if (optionscript.barrier && ps.barrieron)
                                             {
                                                 barrierbreak(true, ps);
@@ -916,7 +921,9 @@ public class Piece : MonoBehaviour
                                 {
                                     if (colornum != ps.colornum)
                                     {
-                                        cutpiece(ps.colornum, ps.piecenumber, ps.gameObject);
+                                        Debug.Log("111111111111111111111111111111111111111111111111111111111111111");
+                                        StartCoroutine(bpath.movebacktohome(ps, ps.CurrentPosition, 0, 0.1f));
+                                        //cutpiece(ps.colornum, ps.piecenumber, ps.gameObject);
 
                                         if(optionscript.barrier && ps.barrieron)
                                         {
@@ -1056,8 +1063,10 @@ public class Piece : MonoBehaviour
         }
         
     }
+
     public void cutpiece(int colornumber, int piecenum, GameObject gobj)
     {
+        
         if (colornumber == 3)
         {
             if (piecenum == 0)
@@ -1136,7 +1145,7 @@ public class Piece : MonoBehaviour
             {
                 gobj.transform.position = greenhomepos[3].position;
             }
-
+           
         }
     }
 
