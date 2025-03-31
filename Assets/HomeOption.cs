@@ -28,6 +28,7 @@ public class HomeOption : MonoBehaviour
 
     private void Start()
     {
+        //PlayerPrefs.DeleteAll();
         for (int i = 0; i < 4; i++)
         {
             buttonstate.Add(0);
@@ -467,7 +468,7 @@ public class HomeOption : MonoBehaviour
         //Debug.Log(PlayerPrefs.GetInt("AI3"));
         //Debug.Log(PlayerPrefs.GetInt("AI4"));
     }
-
+    public GameObject continuegameunfinished;
     
     public void scenechange()
     {
@@ -480,7 +481,21 @@ public class HomeOption : MonoBehaviour
             {
                 if(noofAI < noofplayer)
                 {
-                    SceneManager.LoadScene(1);
+                    if(PlayerPrefs.HasKey("SaveEnable"))
+                    {
+                        if(PlayerPrefs.GetFloat("SaveEnable") == 1)
+                        {
+                            continuegameunfinished.SetActive(true);
+                        }
+                        else
+                        {
+                            SceneManager.LoadScene(1);
+                        }
+                    }
+                    else
+                    {
+                        SceneManager.LoadScene(1);
+                    }
                 }
                 else
                 {

@@ -6,6 +6,8 @@ using UnityEngine.UIElements;
 using TMPro;
 using System.Net.NetworkInformation;
 using UnityEngine.LowLevel;
+using System.Linq;
+using System;
 
 public class PieceManager : MonoBehaviour
 {
@@ -57,6 +59,223 @@ public class PieceManager : MonoBehaviour
     public int secondoneorsix;
     bool forceturnchange = false;
 
+
+
+    public void SaveGameState()
+    {
+        // Basic variables
+        PlayerPrefs.SetInt("currentDiceValue", currentDiceValue);
+        PlayerPrefs.SetInt("dicenum", dicenum);
+        PlayerPrefs.SetInt("colorchoose", colorchoose);
+        PlayerPrefs.SetInt("dicecontinuerollcount", dicecontinuerollcount);
+        PlayerPrefs.SetInt("totalplayer", totalplayer);
+        PlayerPrefs.SetInt("oneorsix", oneorsix);
+        PlayerPrefs.SetInt("secondoneorsix", secondoneorsix);
+
+        // Booleans
+        PlayerPrefs.SetInt("isAI", isAI ? 1 : 0);
+        PlayerPrefs.SetInt("AIenable", AIenable ? 1 : 0);
+        PlayerPrefs.SetInt("selectedpiecemove", selectedpiecemove ? 1 : 0);
+        PlayerPrefs.SetInt("threeconsecutivecut", threeconsecutivecut ? 1 : 0);
+        PlayerPrefs.SetInt("coinoutboolenable", coinoutboolenable ? 1 : 0);
+        PlayerPrefs.SetInt("isWaitingForSelection", isWaitingForSelection ? 1 : 0);
+        PlayerPrefs.SetInt("forceturnchange", forceturnchange ? 1 : 0);
+
+        // Dice collider state
+        PlayerPrefs.SetInt("dicecolliderEnabled", dicecollider.enabled ? 1 : 0);
+
+        // Lists
+        SaveList(storedicevalue, "storedicevalue");
+        SavePieceList(movablePieces, "movablePieces");
+
+        // Dictionary
+        List<string> dictEntries = new List<string>();
+        foreach (var pair in samePosDictionary)
+        {
+            string entry = pair.Key + ":";
+            entry += string.Join("|", pair.Value.Select(p => p.GetComponent<Piece>().UniqueID));
+            dictEntries.Add(entry);
+        }
+        PlayerPrefs.SetString("samePosDictionary", string.Join(";", dictEntries));
+
+        // Player pieces
+        SavePlayerPieces(player1Pieces, "Green");
+        SavePlayerPieces(player2Pieces, "Yellow");
+        SavePlayerPieces(player3Pieces, "Blue");
+        SavePlayerPieces(player4Pieces, "Red");
+
+        // Rankings
+        PlayerPrefs.SetInt("FirstRank", firstranked);
+        PlayerPrefs.SetInt("SecondRank", secondranked);
+        PlayerPrefs.SetInt("ThirdRank", thirdranked);
+        PlayerPrefs.SetInt("FourthRank", fourthranked);
+
+        PlayerPrefs.Save();
+    }
+
+    void SaveList<T>(List<T> list, string key)
+    {
+        PlayerPrefs.SetString(key, string.Join(",", list));
+    }
+
+    void SavePieceList(List<Piece> pieces, string key)
+    {
+        PlayerPrefs.SetString(key, string.Join(",", pieces.Select(p => p.UniqueID)));
+    }
+
+    void SavePlayerPieces(List<Piece> pieces, string color)
+    {
+        for (int i = 0; i < pieces.Count; i++)
+        {
+            Piece p = pieces[i];
+            string prefix = $"{color}_Piece_{i}";
+            p.SaveGame();
+            PlayerPrefs.SetInt($"{prefix}_Position", p.CurrentPosition);
+            PlayerPrefs.SetInt($"{prefix}_InBase", p.IsInBase ? 1 : 0);
+            PlayerPrefs.SetInt($"{prefix}_InHome", p.IsInHome ? 1 : 0);
+            PlayerPrefs.SetInt($"{prefix}_Barrier", p.barrieron ? 1 : 0);
+            PlayerPrefs.SetInt($"{prefix}_AlreadySelected", Piece.alreadyselected ? 1 : 0);
+            PlayerPrefs.SetInt($"{prefix}_Colornum", p.colornum);
+            PlayerPrefs.SetInt($"{prefix}_Piecenum", p.piecenumber);
+        }
+    }
+
+    public void LoadGameState()
+    {
+        // Basic variables
+        currentDiceValue = PlayerPrefs.GetInt("currentDiceValue", 0);
+        dicenum = PlayerPrefs.GetInt("dicenum", 0);
+        colorchoose = PlayerPrefs.GetInt("colorchoose", 0);
+        dicecontinuerollcount = PlayerPrefs.GetInt("dicecontinuerollcount", 0);
+        totalplayer = PlayerPrefs.GetInt("totalplayer", 4);
+        oneorsix = PlayerPrefs.GetInt("oneorsix", 1);
+        secondoneorsix = PlayerPrefs.GetInt("secondoneorsix", 6);
+
+        // Booleans
+        isAI = PlayerPrefs.GetInt("isAI", 0) == 1;
+        AIenable = PlayerPrefs.GetInt("AIenable", 0) == 1;
+        selectedpiecemove = PlayerPrefs.GetInt("selectedpiecemove", 0) == 1;
+        threeconsecutivecut = PlayerPrefs.GetInt("threeconsecutivecut", 0) == 1;
+        coinoutboolenable = PlayerPrefs.GetInt("coinoutboolenable", 0) == 1;
+        isWaitingForSelection = PlayerPrefs.GetInt("isWaitingForSelection", 0) == 1;
+        forceturnchange = PlayerPrefs.GetInt("forceturnchange", 0) == 1;
+
+        // Dice collider
+        dicecollider.enabled = PlayerPrefs.GetInt("dicecolliderEnabled", 1) == 1;
+
+        
+        // Lists
+        storedicevalue = LoadList<int>("storedicevalue");
+        movablePieces = LoadPieceList("movablePieces");
+
+        // Dictionary
+        samePosDictionary.Clear();
+        string dictData = PlayerPrefs.GetString("samePosDictionary", "");
+        if (!string.IsNullOrEmpty(dictData))
+        {
+            foreach (string entry in dictData.Split(';'))
+            {
+                string[] parts = entry.Split(':');
+                if (parts.Length == 2)
+                {
+                    int key = int.Parse(parts[0]);
+                    List<GameObject> value = parts[1].Split('|')
+                        .Select(FindPieceByID).Where(p => p != null).ToList();
+                    samePosDictionary[key] = value;
+                }
+            }
+        }
+
+        // Player pieces
+        LoadPlayerPieces(player1Pieces, "Green");
+        LoadPlayerPieces(player2Pieces, "Yellow");
+        LoadPlayerPieces(player3Pieces, "Blue");
+        LoadPlayerPieces(player4Pieces, "Red");
+
+        // Rankings
+        firstranked = PlayerPrefs.GetInt("FirstRank", 1000);
+        secondranked = PlayerPrefs.GetInt("SecondRank", 1000);
+        thirdranked = PlayerPrefs.GetInt("ThirdRank", 1000);
+        fourthranked = PlayerPrefs.GetInt("FourthRank", 1000);
+
+        // Rebuild game state
+        StartCoroutine(RebuildGameState());
+    }
+
+    List<T> LoadList<T>(string key)
+    {
+        string data = PlayerPrefs.GetString(key, "");
+        return string.IsNullOrEmpty(data) ? new List<T>() :
+            data.Split(',').Select(s => (T)Convert.ChangeType(s, typeof(T))).ToList();
+    }
+
+    List<Piece> LoadPieceList(string key)
+    {
+        string data = PlayerPrefs.GetString(key, "");
+        return string.IsNullOrEmpty(data) ? new List<Piece>() :
+            data.Split(',').Select(FindPieceByID).Where(p => p != null)
+                .Select(p => p.GetComponent<Piece>()).ToList();
+    }
+
+    void LoadPlayerPieces(List<Piece> pieces, string color)
+    {
+        for (int i = 0; i < pieces.Count; i++)
+        {
+            string prefix = $"{color}_Piece_{i}";
+            Piece p = pieces[i];
+            p.LoadGame();
+            p.CurrentPosition = PlayerPrefs.GetInt($"{prefix}_Position", -1);
+            p.IsInBase = PlayerPrefs.GetInt($"{prefix}_InBase", 1) == 1;
+            p.IsInHome = PlayerPrefs.GetInt($"{prefix}_InHome", 0) == 1;
+            p.barrieron = PlayerPrefs.GetInt($"{prefix}_Barrier", 0) == 1;
+            p.colornum = PlayerPrefs.GetInt($"{prefix}_Colornum", 0);
+            p.piecenumber = PlayerPrefs.GetInt($"{prefix}_Piecenum", 0);
+            Piece.alreadyselected = PlayerPrefs.GetInt($"{prefix}_AlreadySelected", 0) == 1;
+
+            // Update visual state
+            //if (!p.IsInBase && !p.IsInHome)
+            //{
+            //    boardPath.UpdatePiecePosition(p, p.CurrentPosition);
+            //}
+        }
+    }
+
+    IEnumerator RebuildGameState()
+    {
+        yield return null; // Wait one frame
+
+        // Recalculate movable pieces
+        movablePieces = GetMovablePieces(
+            GetPlayerPieces(colorchoose),
+            currentDiceValue
+        );
+
+        if(dicecollider.enabled == false)
+        {
+            pieceanim(true, movablePieces);  
+        }
+
+        // Update dice system state
+        //diceSystem.currentPlayerIndex = colorchoose;
+        //diceSystem.changedicecoloronturn(currentDiceValue);
+
+        // Update AI state if needed
+        //if (isAI) diceSystem.AIsubfunc(diceSystem.noofAI, false);
+    }
+
+    // Helper method to find pieces by ID
+    GameObject FindPieceByID(string id)
+    {
+        string[] parts = id.Split('-');
+        if (parts.Length != 2) return null;
+
+        int color = int.Parse(parts[0]);
+        int number = int.Parse(parts[1]);
+
+        return GetPlayerPieces(color)
+            .FirstOrDefault(p => p.piecenumber == number)?.gameObject;
+    }
+
     void movingspeed()
     {
         moveDuration = 0.2f;
@@ -76,7 +295,8 @@ public class PieceManager : MonoBehaviour
                 return;
             }
         }
-        Piece.selectedpiece = movablePieces[Random.Range(0, movablePieces.Count)].gameObject;
+        //Piece.selectedpiece = movablePieces[Random.Range(0, movablePieces.Count)].gameObject;
+        Piece.selectedpiece = movablePieces[UnityEngine.Random.Range(0, movablePieces.Count)].gameObject;
         Debug.Log(Piece.selectedpiece.name);
         Piece.alreadyselected = true;
 
@@ -177,6 +397,10 @@ public class PieceManager : MonoBehaviour
         pl2 = LudoDice2D.player2;
         pl3 = LudoDice2D.player3;
         pl4 = LudoDice2D.player4;
+
+
+        if(optionscript.loadingenable && optionscript.saveenable)
+        LoadGameState();
     }
 
     int pl1, pl2, pl3, pl4;
@@ -194,7 +418,9 @@ public class PieceManager : MonoBehaviour
     public GameObject gameoverUI;
     public static void onpiecehomecomplete(List<Piece> homeps)
     {
+        Debug.Log("Colornum:" + homeps[0].colornum +":AINUM:" + LudoDice2D.AIstaticnum + ":" + LudoDice2D.AIstaticnum1 + ":" + LudoDice2D.AIstaticnum2 + ":" + LudoDice2D.AIstaticnum3);
         homefunc(homeps[0].colornum);
+        Debug.Log("Colornum:" + homeps[0].colornum +":AINUM:" + LudoDice2D.AIstaticnum + ":" + LudoDice2D.AIstaticnum1 + ":" + LudoDice2D.AIstaticnum2 + ":" + LudoDice2D.AIstaticnum3);
         ainumcheck(homeps[0].colornum);
 
         LudoDice2D.playernum--;
@@ -218,7 +444,9 @@ public class PieceManager : MonoBehaviour
             fourthranked = homeps[0].colornum;
   
         }
-
+        Debug.Log("First:" + firstranked + ":Second:" + secondranked + ":Third:" + thirdranked + ":Fourth:" + fourthranked);
+        Debug.Log("PlayerNUM:" + LudoDice2D.playernum + ":" + LudoDice2D.player1 + ":" + LudoDice2D.player2 + ":" + LudoDice2D.player3 + ":" + LudoDice2D.player4);
+        Debug.Log("AINUM:" + LudoDice2D.AIstaticnum + ":" + LudoDice2D.AIstaticnum1 + ":" + LudoDice2D.AIstaticnum2 + ":" + LudoDice2D.AIstaticnum3);
     }
 
     //turn issue..................................................................................................
@@ -438,7 +666,7 @@ public class PieceManager : MonoBehaviour
                         }
 
                         if(Piece.selectedpiece == null)
-                        Piece.selectedpiece = movablePieces[Random.Range(0, movablePieces.Count)].gameObject;
+                        Piece.selectedpiece = movablePieces[UnityEngine.Random.Range(0, movablePieces.Count)].gameObject;
                         Debug.Log(Piece.selectedpiece.name);
                         Piece.alreadyselected = true;
 
@@ -453,7 +681,7 @@ public class PieceManager : MonoBehaviour
                     //if(formustcutgameobject != null)
                     if(formustcutlist.Count > 0)
                     {
-                        int i = Random.Range(0, formustcutlist.Count);
+                        int i = UnityEngine.Random.Range(0, formustcutlist.Count);
                         Piece.selectedpiece = formustcutlist[i];
                     }
                 }
@@ -1245,7 +1473,7 @@ public class PieceManager : MonoBehaviour
 
                 diceSystem.AIsubfunc(diceSystem.noofAI, true);
             }
-
+            Debug.Log("::::::::::::::::::::::::::::::::::::" + LudoDice2D.AIjustnumber);
         }
 
         if (forceturnchange)
@@ -1426,6 +1654,10 @@ public class PieceManager : MonoBehaviour
             background4.SetActive(false);
             text4.text = " ";
         }
+
+
+        PlayerPrefs.SetFloat("SaveEnable", 0);
+        PlayerPrefs.SetFloat("LoadingEnable", 1);
     }
     IEnumerator delayfor5(float delayamount, int fordifferentdelay)
     {
@@ -1441,19 +1673,22 @@ public class PieceManager : MonoBehaviour
              //if(dicecontinuerollcount == storedicevalue.Count)
             if(diceSystem.continuerollcounter == diceSystem.dicevaluestore.Count)
             {
+                diceSystem.AIagain = false;
+                diceSystem.turnchangecheck = false;
                 diceSystem.continuerollcounter = 0;
                 diceSystem.rollingfinish = false;
                 diceSystem.dicevaluestore.Clear();
                 turningupdate(prevcurpos, ainum, fordifferentdelay);
                 diceSystem.changedicecoloronturn(currentDiceValue);
+                isitreallyAI = false;
             }
         }
         else
         {
             turningupdate(prevcurpos, ainum, fordifferentdelay);
             diceSystem.changedicecoloronturn(currentDiceValue);
+            isitreallyAI = false;
         }
-        isitreallyAI = false;
         if (oneorsix == 1)
         {
             // Check for special conditions (e.g., 6 gives another turn)

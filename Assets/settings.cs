@@ -1,9 +1,12 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 public class settings : MonoBehaviour
 {
     public GameObject settinggameobject;
+    public PieceManager pm;
+    public LudoDice2D ludo2d;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
 
@@ -19,9 +22,39 @@ public class settings : MonoBehaviour
 
     public void backbutton()
     {
+        if(optionscript.saveenable)
+        if(ludo2d != null && pm != null)
+        {
+            ludo2d.SaveGameState();
+            pm.SaveGameState();
+            optionscript.SaveAllOptions();
+        }
         Time.timeScale = 1f;
         SceneManager.LoadScene(0);
 
+    }
+    //bool initialbool = true;
+    public TMP_Text textbool;
+    public void loadenablechange(bool initialbool)
+    {
+        if(!initialbool)
+        {
+            //initialbool = false;
+            //textbool.text = "Disable";
+            PlayerPrefs.SetFloat("LoadingEnable", 0);
+        }
+        else
+        {
+            //initialbool = true;
+            //textbool.text = "Enable";
+            PlayerPrefs.SetFloat("LoadingEnable", 1);
+        }
+
+        SceneManager.LoadScene(1);
+    }
+    public void homebutton()
+    {
+        SceneManager.LoadScene(0);
     }
     public void nextgame()
     {

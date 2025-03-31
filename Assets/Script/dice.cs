@@ -4,6 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework.Interfaces;
 using NUnit.Framework;
+using System.Linq;
+using System;
 
 public class LudoDice2D : MonoBehaviour
 {
@@ -107,6 +109,11 @@ public class LudoDice2D : MonoBehaviour
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = 60;
 
+        dicecollider = GetComponent<Collider2D>();
+        AIplayernum = 30;
+        AIplayernum1 = 30;
+        AIplayernum2 = 30;
+        AIplayernum3 = 30;
         noofAI = 0;
         coroutinecompletes = false;
         touchbool = false;
@@ -180,6 +187,11 @@ public class LudoDice2D : MonoBehaviour
         AIstaticnum2 = AIplayernum2;
         AIstaticnum3 = AIplayernum3;
         probabilityplayer = 10;
+
+        if(optionscript.loadingenable && optionscript.saveenable)
+        {
+            LoadGameState();
+        }
     }
 
     void Playerpreferenceupdate()
@@ -209,7 +221,7 @@ public class LudoDice2D : MonoBehaviour
             optionscript.coinnumber = PlayerPrefs.GetInt("CoinNumber");
         }
     }
-    void playerAIorhumandecide()
+    public void playerAIorhumandecide()
     {
         if(PlayerPrefs.HasKey("Player1") && PlayerPrefs.HasKey("Player2") && PlayerPrefs.HasKey("Player3") && PlayerPrefs.HasKey("Player4") && PlayerPrefs.HasKey("PlayerNumber"))
         {
@@ -686,6 +698,8 @@ public class LudoDice2D : MonoBehaviour
     int diffcurnum = -1;
     public int continuerollcounter = 0;
     public bool continuerollbool = false;
+
+    int icount = 0, jcount =0;
     public void Update()
     {
         playernumberupdating();
@@ -697,6 +711,11 @@ public class LudoDice2D : MonoBehaviour
         {
             if (touchrollbool)
             {
+                if(icount < 5)
+                {
+                    icount++;
+                    Debug.Log("CurrentIndex:" + currentPlayerIndex);
+                }
                 StartCoroutine(touchroll());
                 //AIsubfunc(noofAI, true);
             }
@@ -709,6 +728,11 @@ public class LudoDice2D : MonoBehaviour
             }
             diffcurnum = currentPlayerIndex;
             numberofAI = noofAI;
+            if (jcount < 5)
+            {
+                jcount++;
+                Debug.Log("CurrentIndex:" + currentPlayerIndex);
+            }
             AIrollfunc();
         }
         //else
@@ -770,7 +794,7 @@ public class LudoDice2D : MonoBehaviour
             Debug.Log("Continueroll:::::::::::::::::::::::::::::::::::::::::::::::::::::::");
             yield return StartCoroutine(rollinganim());
             if (currentPlayerIndex != probabilityplayer)
-                finalValue = Random.Range(1, 7);
+                finalValue = UnityEngine.Random.Range(1, 7);
 
             else
                 finalValue = probDice();
@@ -792,6 +816,7 @@ public class LudoDice2D : MonoBehaviour
                 thiscodecomplete = true;
                 piecemanagercodecomplete = true;
                 isAI = false;
+                AIagain = true;
             }
             else
             {
@@ -804,6 +829,7 @@ public class LudoDice2D : MonoBehaviour
                         thiscodecomplete = true;
                         piecemanagercodecomplete = true;
                         isAI = false;
+                        AIagain = true;
                     }
                     else
                     {
@@ -811,6 +837,8 @@ public class LudoDice2D : MonoBehaviour
                         //yield return StartCoroutine(RollDice());
                         dicevaluestore.Add(finalValue);
                         rollingfinish = true;
+                        AIagain = false;
+                        //turnchangecheck = false;
                     }
                 }
                 else
@@ -819,6 +847,9 @@ public class LudoDice2D : MonoBehaviour
                     //yield return StartCoroutine(RollDice());
                     dicevaluestore.Add(finalValue);
                     rollingfinish = true;
+                    AIagain = false;
+
+                    //turnchangecheck = false;
                 }
             }
             thisfunccontinueonetime = false;
@@ -862,7 +893,7 @@ public class LudoDice2D : MonoBehaviour
 
     public int probDice()
     {
-        int randomIndex = Random.Range(0, weightedDice.Length);
+        int randomIndex = UnityEngine.Random.Range(0, weightedDice.Length);
         return weightedDice[randomIndex];
     }
     public void changedicecoloronturn(int dicevalue)
@@ -960,7 +991,7 @@ public class LudoDice2D : MonoBehaviour
             {
                 if (Piece.greenoneappear == false)
                 {
-                    int randnum = Random.Range(0, 10);
+                    int randnum = UnityEngine.Random.Range(0, 10);
 
                     if (dicecount > randnum)
                     {
@@ -972,7 +1003,7 @@ public class LudoDice2D : MonoBehaviour
             {
                 if (Piece.yellowoneappear == false)
                 {
-                    int randnum = Random.Range(0, 10);
+                    int randnum = UnityEngine.Random.Range(0, 10);
 
                     if (dicecount > randnum)
                     {
@@ -984,7 +1015,7 @@ public class LudoDice2D : MonoBehaviour
             {
                 if (Piece.blueoneappear == false)
                 {
-                    int randnum = Random.Range(0, 10);
+                    int randnum = UnityEngine.Random.Range(0, 10);
 
                     if (dicecount > randnum)
                     {
@@ -996,7 +1027,7 @@ public class LudoDice2D : MonoBehaviour
             {
                 if (Piece.redoneappear == false)
                 {
-                    int randnum = Random.Range(0, 10);
+                    int randnum = UnityEngine.Random.Range(0, 10);
 
                     if (dicecount > randnum)
                     {
@@ -1058,10 +1089,10 @@ public class LudoDice2D : MonoBehaviour
         //Debug.Log("Currentplayer" + CurrentPlayer + "CurrentPlayerIndex:" + currentPlayerIndex);
         for (int i = 0; i < rollAnimFrames; i++)
         {
-            int randomrotrange = Random.Range(0, 360);
+            int randomrotrange = UnityEngine.Random.Range(0, 360);
             transform.Rotate(0, 0, randomrotrange);
 
-            int randomFace = Random.Range(0, 2);
+            int randomFace = UnityEngine.Random.Range(0, 2);
 
             if (CurrentPlayer == 1)
             {
@@ -1136,7 +1167,7 @@ public class LudoDice2D : MonoBehaviour
             if (oneappeardice == false)
             {
                 if (currentPlayerIndex != probabilityplayer)
-                    finalValue = Random.Range(1, 7);
+                    finalValue = UnityEngine.Random.Range(1, 7);
 
                 else
                     finalValue = probDice();
@@ -1385,4 +1416,163 @@ public class LudoDice2D : MonoBehaviour
          Debug.Log("CurrentPlayerIndex:"+currentPlayerIndex+":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
     }
 
+
+    [Header("Collider Reference")]
+    [SerializeField] private Collider2D dicecollider;
+    public void SaveGameState()
+    {
+        // Dice state rollingfinish touchrollbool dicestorevalue
+        PlayerPrefs.SetInt("finalValue", finalValue);
+        PlayerPrefs.SetInt("dicecount", dicecount);
+        PlayerPrefs.SetInt("currentPlayerIndex", currentPlayerIndex);
+        PlayerPrefs.SetInt("prevdicenumber", prevdicenumber);
+        PlayerPrefs.SetInt("oneorsix", oneorsix);
+        PlayerPrefs.SetInt("secondoneorsix", secondoneorsix);
+        PlayerPrefs.SetInt("oneorsixcounter", oneorsixcounter);
+        PlayerPrefs.SetInt("seconddicecounter", seconddicecounter);
+
+        Debug.Log("CurrentPlayerIndex" + PlayerPrefs.GetInt("currentPlayerIndex", currentPlayerIndex));
+        // Player/AI configuration
+        PlayerPrefs.SetInt("playernum", playernum);
+        PlayerPrefs.SetInt("player1", player1);
+        PlayerPrefs.SetInt("player2", player2);
+        PlayerPrefs.SetInt("player3", player3);
+        PlayerPrefs.SetInt("player4", player4);
+        PlayerPrefs.SetInt("noofAI", noofAI);
+        PlayerPrefs.SetInt("AIplayernum1", AIplayernum1);
+        PlayerPrefs.SetInt("AIplayernum2", AIplayernum2);
+        PlayerPrefs.SetInt("AIplayernum3", AIplayernum3);
+
+        // Game state flags
+        PlayerPrefs.SetInt("isAI", isAI ? 1 : 0);
+        PlayerPrefs.SetInt("isAIturn", isAIturn ? 1 : 0);
+        PlayerPrefs.SetInt("threehome", threehome ? 1 : 0);
+        PlayerPrefs.SetInt("threeoneorsix", threeoneorsix ? 1 : 0);
+        PlayerPrefs.SetInt("seconddice3times", seconddice3times ? 1 : 0);
+        PlayerPrefs.SetInt("isDragging", isDragging ? 1 : 0);
+        PlayerPrefs.SetInt("collisiontruepiece", collisiontruepiece ? 1 : 0);
+
+        PlayerPrefs.SetInt("rollingfinish", rollingfinish ? 1 : 0);
+        PlayerPrefs.SetInt("touchrollbool", touchrollbool ? 1 : 0);
+        PlayerPrefs.SetInt("Continuecounter", continuerollcounter);
+
+        SaveDiceValues();
+
+        // Dice visual state
+        PlayerPrefs.SetFloat("diceTransparency", diceRenderer.color.a);
+        PlayerPrefs.SetInt("dicecolliderEnabled", dicecollider.enabled ? 1 : 0);
+
+        // Static variables
+        PlayerPrefs.SetInt("AIstaticnum", AIstaticnum);
+        PlayerPrefs.SetInt("AIstaticnum1", AIstaticnum1);
+        PlayerPrefs.SetInt("AIstaticnum2", AIstaticnum2);
+        PlayerPrefs.SetInt("AIstaticnum3", AIstaticnum3);
+        PlayerPrefs.SetInt("AIjustnumber", AIjustnumber);
+
+        PlayerPrefs.Save();
+    }
+
+
+    public void LoadGameState()
+    {
+        // Dice state
+        finalValue = PlayerPrefs.GetInt("finalValue", 0);
+        dicecount = PlayerPrefs.GetInt("dicecount", 0);
+        currentPlayerIndex = PlayerPrefs.GetInt("currentPlayerIndex", 0);
+        Debug.Log("CurrentPlayerIndexLoading"+currentPlayerIndex);
+        prevdicenumber = PlayerPrefs.GetInt("prevdicenumber", 0);
+        oneorsix = PlayerPrefs.GetInt("oneorsix", 1);
+        secondoneorsix = PlayerPrefs.GetInt("secondoneorsix", 6);
+        oneorsixcounter = PlayerPrefs.GetInt("oneorsixcounter", 0);
+        seconddicecounter = PlayerPrefs.GetInt("seconddicecounter", 0);
+
+        // Player/AI configuration
+        playernum = PlayerPrefs.GetInt("playernum", 4);
+        player1 = PlayerPrefs.GetInt("player1", 0);
+        player2 = PlayerPrefs.GetInt("player2", 1);
+        player3 = PlayerPrefs.GetInt("player3", 2);
+        player4 = PlayerPrefs.GetInt("player4", 3);
+        noofAI = PlayerPrefs.GetInt("noofAI", 0);
+        AIplayernum1 = PlayerPrefs.GetInt("AIplayernum1", 0);
+        AIplayernum2 = PlayerPrefs.GetInt("AIplayernum2", 1);
+        AIplayernum3 = PlayerPrefs.GetInt("AIplayernum3", 2);
+
+        // Game state flags
+        isAI = PlayerPrefs.GetInt("isAI", 0) == 1;
+        isAIturn = PlayerPrefs.GetInt("isAIturn", 0) == 1;
+        threehome = PlayerPrefs.GetInt("threehome", 0) == 1;
+        threeoneorsix = PlayerPrefs.GetInt("threeoneorsix", 0) == 1;
+        seconddice3times = PlayerPrefs.GetInt("seconddice3times", 0) == 1;
+        isDragging = PlayerPrefs.GetInt("isDragging", 0) == 1;
+        collisiontruepiece = PlayerPrefs.GetInt("collisiontruepiece", 0) == 1;
+
+
+        rollingfinish = PlayerPrefs.GetInt("rollingfinish", 0) == 1;
+        touchrollbool = PlayerPrefs.GetInt("touchrollbool", 0) == 1;
+       continuerollcounter = PlayerPrefs.GetInt("Continuecounter");
+        //PlayerPrefs.SetInt("touchrollbool", touchrollbool ? 1 : 0);
+        PlayerPrefs.SetInt("Continuecounter", continuerollcounter);
+        // Dice visual state
+        Color c = diceRenderer.color;
+        c.a = PlayerPrefs.GetFloat("diceTransparency", 1f);
+        diceRenderer.color = c;
+        dicecollider.enabled = PlayerPrefs.GetInt("dicecolliderEnabled", 1) == 1;
+        LoadDiceValues();
+        // Static variables
+        AIstaticnum = PlayerPrefs.GetInt("AIstaticnum", 0);
+        AIstaticnum1 = PlayerPrefs.GetInt("AIstaticnum1", 0);
+        AIstaticnum2 = PlayerPrefs.GetInt("AIstaticnum2", 1);
+        AIstaticnum3 = PlayerPrefs.GetInt("AIstaticnum3", 2);
+        AIjustnumber = PlayerPrefs.GetInt("AIjustnumber", 0);
+
+        // Rebuild state
+        changedicecoloronturn(finalValue);
+        UpdatePlayerNumbers();
+    }
+
+
+    public void SaveDiceValues()
+    {
+        // Convert the list of ints to a comma-separated string
+        string diceValuesString = string.Join(",", dicevaluestore.Select(i => i.ToString()).ToArray());
+        PlayerPrefs.SetString("DiceValues", diceValuesString);
+        PlayerPrefs.Save();
+        Debug.Log("Saved DiceValues: " + diceValuesString);
+    }
+
+    // Call this to load the list from PlayerPrefs
+    public void LoadDiceValues()
+    {
+        if (PlayerPrefs.HasKey("DiceValues"))
+        {
+            string diceValuesString = PlayerPrefs.GetString("DiceValues");
+            // Split the string back into an array of string tokens
+            string[] tokens = diceValuesString.Split(',');
+            // Convert each token back to an int and store it in the list
+            dicevaluestore = new List<int>();
+            foreach (string token in tokens)
+            {
+                if (int.TryParse(token, out int value))
+                {
+                    dicevaluestore.Add(value);
+                }
+            }
+            Debug.Log("Loaded DiceValues: " + diceValuesString);
+        }
+        else
+        {
+            Debug.Log("No saved DiceValues found in PlayerPrefs.");
+        }
+    }
+
+    void UpdatePlayerNumbers()
+    {
+        playernumber = playernum;
+        playernumber1 = player1;
+        playernumber2 = player2;
+        playernumber3 = player3;
+        playernumber4 = player4;
+    }
 }
+
+

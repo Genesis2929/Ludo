@@ -95,12 +95,12 @@ public class BoardPath : MonoBehaviour
             if(red)
             {
                 g3 = redwaypointgameobject;
-                nocuthome[2].SetActive(false);
+                nocuthome[3].SetActive(false);
             }
             if(blue)
             {
                 g4 = bluewaypointgameobject;
-                nocuthome[3].SetActive(false);
+                nocuthome[2].SetActive(false);
             }
         }
         if (g2 != null)

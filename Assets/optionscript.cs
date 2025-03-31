@@ -46,6 +46,9 @@ public class optionscript : MonoBehaviour
     public GameObject starparent = null;
 
 
+    public static bool loadingenable = true;
+
+
 
     [Header("Basic Settings")]
     public bool _startAtOneOrSix = false; // false means start at one
@@ -87,6 +90,135 @@ public class optionscript : MonoBehaviour
     public bool _other3TimesSkip = false;
     public bool _start3TimesCut = false;
 
+
+    public static void LoadAllOptions()
+    {
+        // Game mode settings
+        startatoneorsix = PlayerPrefs.GetInt("OPT_StartMode", 1) == 6;
+        sixgiveanotherturn = PlayerPrefs.GetInt("OPT_SixTurn", 1) == 1;
+        sixalsobringcoinout = PlayerPrefs.GetInt("OPT_SixBringOut", 0) == 1;
+        sixtostart = PlayerPrefs.GetInt("OPT_SixStart", 0) == 1;
+
+        // Rule settings
+        threeonecut = PlayerPrefs.GetInt("OPT_3OneCut", 1) == 1;
+        threeoneskip = PlayerPrefs.GetInt("OPT_3OneSkip", 0) == 1;
+        threesixstart = PlayerPrefs.GetInt("OPT_3SixStart", 1) == 1;
+        showstar = PlayerPrefs.GetInt("OPT_ShowStars", 0) == 1;
+        cutgainturn = PlayerPrefs.GetInt("OPT_CutTurn", 0) == 1;
+        homegainturn = PlayerPrefs.GetInt("OPT_HomeTurn", 1) == 1;
+
+        // Must rules
+        mustcuttable = PlayerPrefs.GetInt("OPT_MustCutTable", 0) == 1;
+        mustbringcoinout = PlayerPrefs.GetInt("OPT_MustBringOut", 0) == 1;
+        barrier = PlayerPrefs.GetInt("OPT_BarrierRule", 0) == 1;
+        mustcuttoenterhome = PlayerPrefs.GetInt("OPT_CutToEnter", 0) == 1;
+
+        // Additional rules
+        onealsogiveturn = PlayerPrefs.GetInt("OPT_OneTurn", 0) == 1;
+        onealsobringcoinout = PlayerPrefs.GetInt("OPT_OneBringOut", 0) == 1;
+        threesixcut = PlayerPrefs.GetInt("OPT_3SixCut", 0) == 1;
+        threesixskip = PlayerPrefs.GetInt("OPT_3SixSkip", 0) == 1;
+        threeonestart = PlayerPrefs.GetInt("OPT_3OneStart", 0) == 1;
+
+        // Gameplay settings
+        flingenable = PlayerPrefs.GetInt("OPT_Fling", 1) == 1;
+        difficultylevel = PlayerPrefs.GetInt("OPT_Difficulty", 1);
+        coinnumber = PlayerPrefs.GetInt("OPT_CoinCount", 4);
+        continueroll = PlayerPrefs.GetInt("OPT_Continue", 1) == 1;
+
+        // Three times rules
+        start3timesskip = PlayerPrefs.GetInt("OPT_3StartSkip", 0) == 1;
+        other3timesskip = PlayerPrefs.GetInt("OPT_3OtherSkip", 0) == 1;
+        start3timescut = PlayerPrefs.GetInt("OPT_3StartCut", 0) == 1;
+
+
+
+
+
+        PlayerPrefs.SetInt("OneOrSix", startatoneorsix ? 6 : 1);
+        PlayerPrefs.SetInt("SixTurn", sixgiveanotherturn ? 1 : 0);
+        PlayerPrefs.SetInt("SixOut", sixalsobringcoinout ? 1 : 0);
+        //PlayerPrefs.SetInt("OPT_SixStart", sixtostart ? 1 : 0);
+
+        // Rule settings
+        PlayerPrefs.SetInt("3onecut", threeonecut ? 1 : 0);
+        PlayerPrefs.SetInt("3oneskip", threeoneskip ? 1 : 0);
+        PlayerPrefs.SetInt("3sixout", threesixstart ? 1 : 0);
+        PlayerPrefs.SetInt("ShowStar", showstar ? 1 : 0);
+        PlayerPrefs.SetInt("cutturn", cutgainturn ? 1 : 0);
+        PlayerPrefs.SetInt("hometurn", homegainturn ? 1 : 0);
+
+        // Must rules
+        PlayerPrefs.SetInt("Mustcutcuttable", mustcuttable ? 1 : 0);
+        PlayerPrefs.SetInt("Mustout", mustbringcoinout ? 1 : 0);
+        PlayerPrefs.SetInt("2coinbarrier", barrier ? 1 : 0);
+        PlayerPrefs.SetInt("Mustcuthome", mustcuttoenterhome ? 1 : 0);
+
+        // Additional rules
+        PlayerPrefs.SetInt("OneTurn", onealsogiveturn ? 1 : 0);
+        PlayerPrefs.SetInt("OneOut", onealsobringcoinout ? 1 : 0);
+        PlayerPrefs.SetInt("3sixcut", threesixcut ? 1 : 0);
+        PlayerPrefs.SetInt("3sixskip", threesixskip ? 1 : 0);
+        PlayerPrefs.SetInt("3oneout", threeonestart ? 1 : 0);
+
+        // Gameplay settings
+        PlayerPrefs.SetInt("Fling", flingenable ? 1 : 0);
+        PlayerPrefs.SetInt("Difflevel", difficultylevel);
+        PlayerPrefs.SetInt("CoinNumber", coinnumber);
+        PlayerPrefs.SetInt("Continueroll", continueroll ? 1 : 0);
+
+        // Three times rules
+        //PlayerPrefs.SetInt("OPT_3StartSkip", start3timesskip ? 1 : 0);
+        //PlayerPrefs.SetInt("OPT_3OtherSkip", other3timesskip ? 1 : 0);
+        //PlayerPrefs.SetInt("OPT_3StartCut", start3timescut ? 1 : 0);
+        // System
+        //loadingenable = PlayerPrefs.GetInt("OPT_Loading", 0) == 1;
+    }
+    public static void SaveAllOptions()
+    {
+        // Game mode settings
+        PlayerPrefs.SetInt("OPT_StartMode", startatoneorsix ? 6 : 1);
+        PlayerPrefs.SetInt("OPT_SixTurn", sixgiveanotherturn ? 1 : 0);
+        PlayerPrefs.SetInt("OPT_SixBringOut", sixalsobringcoinout ? 1 : 0);
+        PlayerPrefs.SetInt("OPT_SixStart", sixtostart ? 1 : 0);
+
+        // Rule settings
+        PlayerPrefs.SetInt("OPT_3OneCut", threeonecut ? 1 : 0);
+        PlayerPrefs.SetInt("OPT_3OneSkip", threeoneskip ? 1 : 0);
+        PlayerPrefs.SetInt("OPT_3SixStart", threesixstart ? 1 : 0);
+        PlayerPrefs.SetInt("OPT_ShowStars", showstar ? 1 : 0);
+        PlayerPrefs.SetInt("OPT_CutTurn", cutgainturn ? 1 : 0);
+        PlayerPrefs.SetInt("OPT_HomeTurn", homegainturn ? 1 : 0);
+
+        // Must rules
+        PlayerPrefs.SetInt("OPT_MustCutTable", mustcuttable ? 1 : 0);
+        PlayerPrefs.SetInt("OPT_MustBringOut", mustbringcoinout ? 1 : 0);
+        PlayerPrefs.SetInt("OPT_BarrierRule", barrier ? 1 : 0);
+        PlayerPrefs.SetInt("OPT_CutToEnter", mustcuttoenterhome ? 1 : 0);
+
+        // Additional rules
+        PlayerPrefs.SetInt("OPT_OneTurn", onealsogiveturn ? 1 : 0);
+        PlayerPrefs.SetInt("OPT_OneBringOut", onealsobringcoinout ? 1 : 0);
+        PlayerPrefs.SetInt("OPT_3SixCut", threesixcut ? 1 : 0);
+        PlayerPrefs.SetInt("OPT_3SixSkip", threesixskip ? 1 : 0);
+        PlayerPrefs.SetInt("OPT_3OneStart", threeonestart ? 1 : 0);
+
+        // Gameplay settings
+        PlayerPrefs.SetInt("OPT_Fling", flingenable ? 1 : 0);
+        PlayerPrefs.SetInt("OPT_Difficulty", difficultylevel);
+        PlayerPrefs.SetInt("OPT_CoinCount", coinnumber);
+        PlayerPrefs.SetInt("OPT_Continue", continueroll ? 1 : 0);
+
+        // Three times rules
+        PlayerPrefs.SetInt("OPT_3StartSkip", start3timesskip ? 1 : 0);
+        PlayerPrefs.SetInt("OPT_3OtherSkip", other3timesskip ? 1 : 0);
+        PlayerPrefs.SetInt("OPT_3StartCut", start3timescut ? 1 : 0);
+
+        // System
+        //PlayerPrefs.SetInt("OPT_Loading", loadingenable ? 1 : 0);
+
+        PlayerPrefs.Save();
+    }
     // In Awake(), assign instance values to the static ones
     void assigning()
     {
@@ -119,6 +251,7 @@ public class optionscript : MonoBehaviour
     }
 
 
+    public static bool saveenable = false;
     public void start3timeupdate()
     {
         if(startatoneorsix == false)
@@ -163,6 +296,25 @@ public class optionscript : MonoBehaviour
 
     private void Awake()
     {
+        if(PlayerPrefs.HasKey("LoadingEnable"))
+            if(PlayerPrefs.GetFloat("LoadingEnable") == 1)
+            {
+                loadingenable = true;
+            }
+            else
+            {
+                loadingenable = false;
+            }
+
+        if (PlayerPrefs.HasKey("SaveEnable"))
+            if (PlayerPrefs.GetFloat("SaveEnable") == 1)
+            {
+                saveenable = true;
+            }
+            else
+            {
+                saveenable = false;
+            }
         prefupdate();
         start3timeupdate();
         showingstar();
@@ -473,17 +625,31 @@ public class optionscript : MonoBehaviour
         }
     }
 
-
+    public LudoDice2D dicesystem;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         assigning();
+
+
+        if(loadingenable)
+        {
+            LoadAllOptions();
+            dicesystem.playerAIorhumandecide();
+        }
     }
 
+    int counter = 0;
     // Update is called once per frame
     void Update()
     {
-        
+        if(counter == 0)
+        {
+            counter++;
+            loadingenable = true;
+            PlayerPrefs.SetFloat("LoadingEnable", 1);
+            PlayerPrefs.SetFloat("SaveEnable", 1);
+        }
     }
 }

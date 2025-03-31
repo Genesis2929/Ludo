@@ -1,10 +1,12 @@
 using NUnit.Framework;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 //using UnityEngine.AdaptivePerformance.VisualScripting;
 
 public class Piece : MonoBehaviour
 {
+    public string UniqueID => $"{colornum}-{piecenumber}";
     public List<Transform> redhomepos = new List<Transform>();
     public List<Transform> greenhomepos = new List<Transform>();
     public List<Transform> bluehomepos = new List<Transform>();
@@ -365,6 +367,13 @@ public class Piece : MonoBehaviour
         greenhomenum = 0;
         yellowhomenum = 0;
         bluehomenum = 0;
+
+        if(optionscript.loadingenable && optionscript.saveenable)
+        {
+            GameObject gmm = gameObject.transform.GetChild(0).gameObject;
+            gmm.GetComponent<CircleCollider2D>().enabled = true;
+            LoadGame();
+        }
 
     }
 
@@ -1148,5 +1157,187 @@ public class Piece : MonoBehaviour
            
         }
     }
+    // Add to Piece class
+    public void SavePieceState()
+    {
+        string prefix = $"{colornum}_{piecenumber}_";
 
+        // Basic state
+        PlayerPrefs.SetInt(prefix + "CurrentPosition", CurrentPosition);
+        PlayerPrefs.SetInt(prefix + "IsInBase", IsInBase ? 1 : 0);
+        PlayerPrefs.SetInt(prefix + "IsInHome", IsInHome ? 1 : 0);
+        PlayerPrefs.SetInt(prefix + "IsMoving", ismoving ? 1 : 0);
+        PlayerPrefs.SetInt(prefix + "BarrierOn", barrieron ? 1 : 0);
+        PlayerPrefs.SetInt(prefix + "TopPosition", toppositionnumber);
+        PlayerPrefs.SetInt(prefix + "WasJustMoving", wasjustmoving ? 1 : 0);
+        PlayerPrefs.SetInt(prefix + "OldDictPosition", olddictionaryposition);
+
+        // Transform position
+        PlayerPrefs.SetFloat(prefix + "posX", transform.position.x);
+        PlayerPrefs.SetFloat(prefix + "posY", transform.position.y);
+        PlayerPrefs.SetFloat(prefix + "posZ", transform.position.z);
+
+        // Piece relationships
+        PlayerPrefs.SetString(prefix + "Parent", transform.parent != null ?
+            transform.parent.GetComponent<Piece>()?.UniqueID : "");
+    }
+
+    public static void SaveAllPieceStates()
+    {
+        // Static states
+        PlayerPrefs.SetInt("RedHaveCut", redhavecut ? 1 : 0);
+        PlayerPrefs.SetInt("GreenHaveCut", greenhavecut ? 1 : 0);
+        PlayerPrefs.SetInt("BlueHaveCut", bluehavecut ? 1 : 0);
+        PlayerPrefs.SetInt("YellowHaveCut", yellowhavecut ? 1 : 0);
+
+        // Home counts
+        PlayerPrefs.SetInt("RedHomeNum", redhomenum);
+        PlayerPrefs.SetInt("GreenHomeNum", greenhomenum);
+        PlayerPrefs.SetInt("YellowHomeNum", yellowhomenum);
+        PlayerPrefs.SetInt("BlueHomeNum", bluehomenum);
+
+        // Save samePosDictionary
+        List<string> dictEntries = new List<string>();
+        foreach (var pair in samePosDictionary)
+        {
+            string entry = $"{pair.Key}:{string.Join("|", pair.Value.Select(go => go.GetComponent<Piece>().UniqueID))}";
+            dictEntries.Add(entry);
+        }
+        PlayerPrefs.SetString("SamePosDictionary", string.Join(";", dictEntries));
+
+        // Save barrier positions
+        PlayerPrefs.SetString("BarrierPos", string.Join(",",
+            barrierpos.Select(p => p.UniqueID)));
+    }
+
+    public void LoadPieceState()
+    {
+        string prefix = $"{colornum}_{piecenumber}_";
+
+        // Basic state
+        CurrentPosition = PlayerPrefs.GetInt(prefix + "CurrentPosition", -1);
+        IsInBase = PlayerPrefs.GetInt(prefix + "IsInBase", 1) == 1;
+        IsInHome = PlayerPrefs.GetInt(prefix + "IsInHome", 0) == 1;
+        ismoving = PlayerPrefs.GetInt(prefix + "IsMoving", 0) == 1;
+        barrieron = PlayerPrefs.GetInt(prefix + "BarrierOn", 0) == 1;
+        toppositionnumber = PlayerPrefs.GetInt(prefix + "TopPosition", 0);
+        wasjustmoving = PlayerPrefs.GetInt(prefix + "WasJustMoving", 0) == 1;
+        olddictionaryposition = PlayerPrefs.GetInt(prefix + "OldDictPosition", 0);
+
+        // Load position
+        Vector3 savedPosition = new Vector3(
+            PlayerPrefs.GetFloat(prefix + "posX", transform.position.x),
+            PlayerPrefs.GetFloat(prefix + "posY", transform.position.y),
+            PlayerPrefs.GetFloat(prefix + "posZ", transform.position.z)
+        );
+
+        // Only restore position if in base/home
+        //if (IsInBase || IsInHome)
+        {
+            transform.position = savedPosition;
+        }
+
+        // Load parent relationship
+        string parentID = PlayerPrefs.GetString(prefix + "Parent", "");
+        if (!string.IsNullOrEmpty(parentID))
+        {
+            GameObject parentPiece = FindPieceByID(parentID);
+            if (parentPiece != null)
+            {
+                transform.SetParent(parentPiece.transform);
+                pieceinsidepiece = true;
+            }
+        }
+    }
+
+    public static void LoadAllPieceStates()
+    {
+        // Static states
+        redhavecut = PlayerPrefs.GetInt("RedHaveCut", 0) == 1;
+        greenhavecut = PlayerPrefs.GetInt("GreenHaveCut", 0) == 1;
+        bluehavecut = PlayerPrefs.GetInt("BlueHaveCut", 0) == 1;
+        yellowhavecut = PlayerPrefs.GetInt("YellowHaveCut", 0) == 1;
+
+        // Home counts
+        redhomenum = PlayerPrefs.GetInt("RedHomeNum", 0);
+        greenhomenum = PlayerPrefs.GetInt("GreenHomeNum", 0);
+        yellowhomenum = PlayerPrefs.GetInt("YellowHomeNum", 0);
+        bluehomenum = PlayerPrefs.GetInt("BlueHomeNum", 0);
+
+        // Load samePosDictionary
+        samePosDictionary.Clear();
+        string dictData = PlayerPrefs.GetString("SamePosDictionary", "");
+        if (!string.IsNullOrEmpty(dictData))
+        {
+            foreach (string entry in dictData.Split(';'))
+            {
+                string[] parts = entry.Split(':');
+                if (parts.Length == 2)
+                {
+                    int key = int.Parse(parts[0]);
+                    List<GameObject> value = parts[1].Split('|')
+                        .Select(FindPieceByID).Where(p => p != null).ToList();
+                    samePosDictionary[key] = value;
+                }
+            }
+        }
+
+        // Load barrier positions
+        barrierpos.Clear();
+        string barrierData = PlayerPrefs.GetString("BarrierPos", "");
+        if (!string.IsNullOrEmpty(barrierData))
+        {
+            foreach (string id in barrierData.Split(','))
+            {
+                GameObject piece = FindPieceByID(id);
+                if (piece != null) barrierpos.Add(piece.GetComponent<Piece>());
+            }
+        }
+    }
+
+    // Helper method to find pieces by ID
+    private static GameObject FindPieceByID(string id)
+    {
+        if (string.IsNullOrEmpty(id)) return null;
+
+        string[] parts = id.Split('-');
+        if (parts.Length != 2) return null;
+
+        int color = int.Parse(parts[0]);
+        int number = int.Parse(parts[1]);
+
+        List<Piece> pieces = color switch
+        {
+            0 => PieceManager.p1piece,
+            1 => PieceManager.p2piece,
+            2 => PieceManager.p3piece,
+            3 => PieceManager.p4piece,
+            _ => new List<Piece>()
+        };
+
+        return pieces.FirstOrDefault(p => p.piecenumber == number)?.gameObject;
+    }
+
+    // Save all pieces
+    public void SaveGame()
+    {
+        //foreach (Piece piece in FindObjectsOfType<Piece>())
+        {
+            SavePieceState();
+        }
+        SaveAllPieceStates();
+        PlayerPrefs.Save();
+    }
+
+    // Load all pieces
+    public void LoadGame()
+    {
+        LoadAllPieceStates();
+        //foreach (Piece piece in FindObjectsOfType<Piece>())
+        {
+            LoadPieceState();
+        }
+
+        // Update positions for pieces on the board
+    }
 }
