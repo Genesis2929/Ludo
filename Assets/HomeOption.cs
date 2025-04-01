@@ -489,11 +489,13 @@ public class HomeOption : MonoBehaviour
                         }
                         else
                         {
+                            PlayerPrefs.SetFloat("LoadingEnable", 0);
                             SceneManager.LoadScene(1);
                         }
                     }
                     else
                     {
+                        PlayerPrefs.SetFloat("LoadingEnable", 0);
                         SceneManager.LoadScene(1);
                     }
                 }
